@@ -51,41 +51,110 @@ class UserProfile(AbstractUser):
     @property
     def fullName(self):
         return '%s %s' % (self.last_name, self.first_name)
+    @property
+    def value(self):
+        return self.id    
+    @property
+    def label(self):
+        return self.name 
 
-class Domain(TimestampedModel):   
-    _safedelete_policy = HARD_DELETE_NOCASCADE 
-    name = models.CharField(max_length=255, unique=True)  
+class Region(TimestampedModel):   
+    name = models.CharField(max_length=255)  
+   
+    def __str__(self):
+        return self.name  
+    @property
+    def value(self):
+        return self.id    
+    @property
+    def label(self):
+        return self.name       
+
+class Prefecture(TimestampedModel):   
+    name = models.CharField(max_length=255)     
+    region = models.ForeignKey(Region, related_name='region', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
-
     @property
     def value(self):
-        return self.id
-    
+        return self.id    
+    @property
+    def label(self):
+        return self.name 
+
+class Commune(TimestampedModel):   
+    name = models.CharField(max_length=1024)     
+    prefecture = models.ForeignKey(Prefecture, related_name='prefecture', on_delete=models.CASCADE, null=True)
+    def __str__(self):
+        return self.name
+    @property
+    def value(self):
+        return self.id    
+    @property
+    def label(self):
+        return self.name 
+
+class Canton(TimestampedModel):   
+    name = models.CharField(max_length=255)     
+    commune = models.ForeignKey(Commune, related_name='commune', on_delete=models.CASCADE)
+  
+    def __str__(self):
+        return self.name
+    @property
+    def value(self):
+        return self.id    
+    @property
+    def label(self):
+        return self.name 
+
+class Locality(TimestampedModel):   
+    name = models.CharField(max_length=1024)     
+    canton = models.ForeignKey(Canton, related_name='canton', on_delete=models.CASCADE)
+  
+    def __str__(self):
+        return self.name
+    @property
+    def value(self):
+        return self.id    
+    @property
+    def label(self):
+        return self.name 
+
+class Domain(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    name = models.CharField(max_length=1024) 
+
+    def __str__(self):
+        return self.name
+    @property
+    def value(self):
+        return self.id    
     @property
     def label(self):
         return self.name   
        
 class Project(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
-    updatedDomain = models.ForeignKey(Domain, related_name='projectDomain', on_delete=models.CASCADE)
-    structure = models.CharField(max_length=255)
-    year = models.DateField()
-    longitude = models.FloatField()
-    latitude = models.FloatField()
-
+    name = models.CharField(max_length=1024)  
+    code = models.CharField(max_length=255)  
+    updatedDomain = models.ForeignKey(Domain, related_name='projectDomain', on_delete=models.CASCADE, null=True)
+    locality = models.ForeignKey(Locality, related_name='projectLocality', on_delete=models.CASCADE, null=True)
+    foundPoints  = models.CharField(max_length=255)
+    year = models.DateField(null=True)
+    number = models.FloatField(default=0) 
+    par = models.CharField(max_length=255)  
+    longitude = models.CharField(max_length=255)
+    latitude = models.CharField(max_length=255)
 
     def __str__(self):
         return self.code
-
     @property
     def value(self):
-        return self.id
-    
+        return self.id    
     @property
     def label(self):
-        return self.wording   
+        return self.code   
 
 class Picture(TimestampedModel):
     name = models.ImageField(upload_to='uploads/images/', blank=True)   

@@ -91,8 +91,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'geoLocProject',
-        'USER': 'geolo',
-        'PASSWORD': 'geoloc2021',
+        'USER': 'root',
+        'PASSWORD': 'password',
         #root , geolo2021: password du root
         'HOST': 'localhost',   
         'PORT': '3306',
