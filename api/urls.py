@@ -11,20 +11,13 @@ router = DefaultRouter()
 router.register('users', views.UserProfileViewSet, basename='users')
 router.register('domains', views.DomainViewSet, basename='domains')
 router.register('projects', views.ProjectViewSet, basename='projects')
+router.register('localities', views.LocalityViewSet, basename='localities')
 
 urlpatterns = [    
     path('', include(router.urls)),
     path('login/', obtain_jwt_token),
     path('projects-filter/', views.projects_filter), 
     path('import-projects/', views.import_projects), 
-
-
-
-
- 
-
-
-
 
  
     

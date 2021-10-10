@@ -74,7 +74,16 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return UserProfileReadSerializer
         return UserProfileSerializer
 
+class LocalityViewSet(viewsets.ModelViewSet):
+    queryset = Locality.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return LocalityReadSerializer
+        return LocalitySerializer
+
 class DomainViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
     queryset = Domain.objects.all()
 
     def get_serializer_class(self):
