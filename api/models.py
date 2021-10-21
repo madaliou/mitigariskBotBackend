@@ -153,11 +153,18 @@ class Project(TimestampedModel):
     def value(self):
         return self.id    
     @property
-    def label(self):
-        return self.code   
+    def label(self):    
+        """ a = "["
+        b= self.longitude
+        c = ", "
+        d = self.latitude
+        g = "]"
+        m = a+b+c+d+g """
+       
+        return self.code
 
 class Picture(TimestampedModel):
-    name = models.ImageField(upload_to='uploads/images/', blank=True)   
+    name = models.ImageField(upload_to='uploads/images/', blank=True)  
 
     class Meta:
         ordering = ['name']

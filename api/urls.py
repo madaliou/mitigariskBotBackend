@@ -18,6 +18,7 @@ urlpatterns = [
     path('login/', obtain_jwt_token),
     path('projects-filter/', views.projects_filter), 
     path('import-projects/', views.import_projects), 
+    path('charts/', views.charts), 
 
  
     

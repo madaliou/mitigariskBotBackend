@@ -196,10 +196,9 @@ import pandas as pd
 import openpyxl
 @api_view(['GET'])
 def import_projects(request):        
-    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/Plateau_Base2.xlsx')
+    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_defintif_info.xlsx')
     SheetNameList = workbook.sheet_names()
     worksheet = workbook.sheet_by_name(SheetNameList[0])
-    print('SheetNameListSheetNameListSheetNameListSheetNameListSheetNameList', SheetNameList)
     num_rows = worksheet.nrows 
     num_cells = worksheet.ncols 
     updatedDomain_R={}
@@ -223,82 +222,104 @@ def import_projects(request):
         cell_value_10 = worksheet.cell_value(curr_row, 10)
         cell_value_11 = worksheet.cell_value(curr_row, 11)
         cell_value_12 = worksheet.cell_value(curr_row, 12)
-        cell_value_13 = worksheet.cell_value(curr_row, 13)
         # Région curr_cell == 3          
         project = Project()
         # Région curr_cell == 3
-        if cell_value_2 not in region_R:
+        if cell_value_1 not in region_R:
             region = Region()
-            region.name = cell_value_2
+            region.name = cell_value_1
             region.save()
-            region_R[cell_value_2] = region
+            region_R[cell_value_1] = region
         # Préfecture curr_cell == 2
-        if cell_value_3 not in prefecture_R:
+        if cell_value_2 not in prefecture_R:
             prefecture = Prefecture()
-            prefecture.name = cell_value_3
-            prefecture_R[cell_value_3] = prefecture
-            prefecture_R[cell_value_3].region = region_R[cell_value_2]
-            prefecture_R[cell_value_3].save()
+            prefecture.name = cell_value_2
+            prefecture_R[cell_value_2] = prefecture
+            prefecture_R[cell_value_2].region = region_R[cell_value_1]
+            prefecture_R[cell_value_2].save()
         # Localité curr_cell == 0
-        if cell_value_4 not in commune_R:
+        if cell_value_3 not in commune_R:
             commune = Commune()
-            commune.name = cell_value_4
-            commune_R[cell_value_4] = commune
-            commune_R[cell_value_4].prefecture = prefecture_R[cell_value_3]
-            commune_R[cell_value_4].save()
+            commune.name = cell_value_3
+            commune_R[cell_value_3] = commune
+            commune_R[cell_value_3].prefecture = prefecture_R[cell_value_2]
+            commune_R[cell_value_3].save()
         # Canton curr_cell == 1
-        if cell_value_5 not in canton_R:
+        if cell_value_4 not in canton_R:
             canton = Canton()
-            canton.name = cell_value_5
-            canton_R[cell_value_5] = canton
-            canton_R[cell_value_5].commune = commune_R[cell_value_4]
-            canton_R[cell_value_5].save()        
+            canton.name = cell_value_4
+            canton_R[cell_value_4] = canton
+            canton_R[cell_value_4].commune = commune_R[cell_value_3]
+            canton_R[cell_value_4].save()        
         # Localité curr_cell == 0
-        if cell_value_7 not in locality_R:
+        if cell_value_6 not in locality_R:
             locality = Locality()
-            locality.name = cell_value_7
-            locality_R[cell_value_7] = locality
-            locality_R[cell_value_7].canton = canton_R[cell_value_5]
-            locality_R[cell_value_7].save()
+            locality.name = cell_value_6
+            locality_R[cell_value_6] = locality
+            locality_R[cell_value_6].canton = canton_R[cell_value_4]
+            locality_R[cell_value_6].save()
             project.locality = locality
             project.save()
-        if cell_value_7 in locality_R:
-            project.locality = locality_R[cell_value_7]
+        if cell_value_6 in locality_R:
+            project.locality = locality_R[cell_value_6]
             project.save()
-        if cell_value_8 not in updatedDomain_R:
+        if cell_value_7 not in updatedDomain_R:
             domain = Domain()
-            domain.name = cell_value_8
+            domain.name = cell_value_7
             domain.save()
-            updatedDomain_R[cell_value_8] = domain 
-            updatedDomain_R[cell_value_8].save() 
+            updatedDomain_R[cell_value_7] = domain 
+            updatedDomain_R[cell_value_7].save()  
             project.updatedDomain = domain
             project.save()
-        if cell_value_8 in updatedDomain_R:
-            project.updatedDomain = updatedDomain_R[cell_value_8]
+        if cell_value_7 in updatedDomain_R:
+            project.updatedDomain = updatedDomain_R[cell_value_7]
             project.save()
         project.code = cell_value_0
-        project.foundPoints = cell_value_1
-        project.name = cell_value_6
-        cel = str(cell_value_9)
+        project.name = cell_value_5
+        cel = str(cell_value_8)
         pp = (cel[:4])     
         project.year = str(pp) + '-01-01'
-        project.par = cell_value_10
+        project.par = cell_value_9
         if cell_value_11 == '':
             project.longitude = 0
         if cell_value_11 != '':
             project.longitude = cell_value_11
         if cell_value_12 == '':
-            project.longitude = 0
-        if cell_value_12 != '':
-            project.longitude = cell_value_12
-        if cell_value_13 != '':
-            project.latitude = cell_value_13 
-        if cell_value_13 == '':
             project.latitude = 0
+        if cell_value_12 != '':
+            project.latitude = cell_value_12
         project.save()
         curr_row = curr_row + 1 
     return Response({'ok': 'Fichier téléversé avec succès'}, status=status.HTTP_200_OK)
  
+@api_view(['GET'])
+def charts(request):
+    tab1 = []
+    tab2 = []
+    dict = {}
+    projects = Project.objects.all()
+    for project in projects:
+        pro = Project.objects.get(code=project)
+        year = pro.year
+        if year not in dict:
+            c = Project.objects.filter(year=pro.year)
+            g = str(pro.year)
+            real = g[:4]
+            tab1.append(real)
+            tab2.append(c.count())
+            """ tab1[pro.id] = pro.year
+            tab2[pro.id] = c.count() """
+            dict[year] = year
+    return Response( {
+                    'labels' : tab1,
+                    'data' : tab2                   
+                    })
+
+    """  dict = {}
+    i = 0
+    #for i in range(len(li)):
+    serializer = UserProfileSerializer(request.user)
+    return Response(serializer.data) """
 
 @api_view(['GET'])
 def get_user(request):
