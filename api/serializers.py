@@ -122,7 +122,7 @@ class DomainSerializer(serializers.ModelSerializer):
 class ProjectReadSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Project
-        fields = ('id', 'code', 'name', 'updatedDomain', 'locality', 'foundPoints', 'year', 'number', 'par', 'longitude', 'latitude', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'code', 'name', 'updatedDomain', 'locality', 'year', 'number', 'par', 'longitude', 'latitude', 'label', 'value','created_at', 'updated_at')   
         depth = 10
 
 class ProjectSerializer(serializers.ModelSerializer):

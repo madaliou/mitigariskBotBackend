@@ -142,7 +142,6 @@ class Project(TimestampedModel):
     code = models.CharField(max_length=255)  
     updatedDomain = models.ForeignKey(Domain, related_name='projectDomain', on_delete=models.CASCADE, null=True)
     locality = models.ForeignKey(Locality, related_name='projectLocality', on_delete=models.CASCADE, null=True)
-    foundPoints  = models.CharField(max_length=255)
     year = models.DateField(null=True)
     number = models.FloatField(default=0) 
     par = models.CharField(max_length=255)  

@@ -105,15 +105,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 'code': request.data['code'],
                 'name': request.data['name'],
                 'updatedDomain': request.data['updatedDomain'],
-                'number': request.data['number'],
                 'par': request.data['par'],
                 'locality': request.data['locality'],
-                'foundPoints': request.data['foundPoints'],
                 'year': str(request.data['year']) + '-01-01',
                 'longitude': request.data['longitude'],
                 'latitude': request.data['latitude']
 
-            }            
+            }   
+        if 'number' in request.data and request.data['number']:
+            data['number'] = request.data['number']         
         serializer = ProjectSerializer(data=data)          
         if serializer.is_valid():
             instance = serializer.save()              
@@ -128,15 +128,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 'code': request.data['code'],
                 'name': request.data['name'],
                 'updatedDomain': request.data['updatedDomain'],
-                'number': request.data['number'],
                 'par': request.data['par'],
                 'locality': request.data['locality'],
-                'foundPoints': request.data['foundPoints'],
                 'year': str(request.data['year']) + '-01-01',
                 'longitude': request.data['longitude'],
                 'latitude': request.data['latitude']                  
             }
-         
+        if 'number' in request.data and request.data['number']:
+            data['number'] = request.data['number'] 
         serializer = ProjectSerializer(instance,data=data)        
         if serializer.is_valid():
             instance = serializer.save()                                                  
