@@ -154,7 +154,6 @@ class PictureViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
 
         if self.request.method in ['GET']:
-
             return PictureReadSerializer
         return PictureSerializer
 
@@ -174,7 +173,8 @@ def projects_filter(request):
         data['updatedDomain'] = request.data['updatedDomain']      
     """ if 'q' in request.data and request.data['q']:
         data['wording__icontains'] = str(request.data['q']) """
-    projects = Project.objects.filter(**data)  
+    projects = Project.objects.filter(**data)  @permission_classes([AllowAny])
+
     if len(projects)> 0:
         paginator = StandardResultsSetPagination()
         result_page = paginator.paginate_queryset(projects, request)
@@ -293,6 +293,7 @@ def import_projects(request):
     return Response({'ok': 'Fichier téléversé avec succès'}, status=status.HTTP_200_OK)
  
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def charts(request):
     tab1 = []
     tab2 = []
@@ -307,19 +308,11 @@ def charts(request):
             real = g[:4]
             tab1.append(real)
             tab2.append(c.count())
-            """ tab1[pro.id] = pro.year
-            tab2[pro.id] = c.count() """
             dict[year] = year
     return Response( {
-                    'labels' : tab1,
-                    'data' : tab2                   
-                    })
-
-    """  dict = {}
-    i = 0
-    #for i in range(len(li)):
-    serializer = UserProfileSerializer(request.user)
-    return Response(serializer.data) """
+        'labels' : tab1,
+        'data' : tab2                   
+        })
 
 @api_view(['GET'])
 def get_user(request):

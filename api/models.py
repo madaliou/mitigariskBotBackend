@@ -133,7 +133,9 @@ class Domain(TimestampedModel):
     @property
     def label(self):
         return self.name   
-       
+
+from rest_framework.response import Response
+
 class Project(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=1024)  
@@ -153,15 +155,11 @@ class Project(TimestampedModel):
     def value(self):
         return self.id    
     @property
-    def label(self):    
-        """ a = "["
-        b= self.longitude
-        c = ", "
-        d = self.latitude
-        g = "]"
-        m = a+b+c+d+g """
-       
-        return self.code
+    def label(self):
+        tab = []   
+        tab.append(self.latitude) 
+        tab.append(self.longitude) 
+        return tab
 
 class Picture(TimestampedModel):
     name = models.ImageField(upload_to='uploads/images/', blank=True)  
