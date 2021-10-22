@@ -139,7 +139,7 @@ from rest_framework.response import Response
 class Project(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=1024)  
-    code = models.CharField(max_length=255)  
+    code = models.CharField(max_length=255, unique=True)  
     updatedDomain = models.ForeignKey(Domain, related_name='projectDomain', on_delete=models.CASCADE, null=True)
     locality = models.ForeignKey(Locality, related_name='projectLocality', on_delete=models.CASCADE, null=True)
     year = models.DateField(null=True)
