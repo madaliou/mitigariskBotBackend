@@ -162,6 +162,7 @@ class Project(TimestampedModel):
 
 class Picture(TimestampedModel):
     name = models.ImageField(upload_to='uploads/images/', blank=True)  
+    project = models.ForeignKey(Project, related_name='projectPictures', null = True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['name']

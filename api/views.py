@@ -74,6 +74,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return UserProfileReadSerializer
         return UserProfileSerializer
 
+class RegionViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Region.objects.all()
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return RegionReadSerializer
+        return RegionSerializer
+
 class LocalityViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Locality.objects.all()
@@ -116,7 +124,27 @@ class ProjectViewSet(viewsets.ModelViewSet):
             data['number'] = request.data['number']         
         serializer = ProjectSerializer(data=data)          
         if serializer.is_valid():
-            instance = serializer.save()              
+            instance = serializer.save() 
+            instance_id = instance.id 
+            if 'proofs' in request.data and request.data['proofs']:
+
+                images = dict((request.data).lists())['proofs']
+                flag = 1
+                arr = []
+                for img_name in images:
+                    modified_data = modify_input_project_multiple_files(
+                        instance_id, img_name)
+                    print(modified_data)
+                    file_serializer = PictureSerializer(data=modified_data)
+                    if file_serializer.is_valid():
+                        file_serializer.save()
+                        arr.append(file_serializer.data)
+                    else:
+                        flag = 0
+                if flag == 1:
+                    show = ProjectReadSerializer(instance)  
+            show = ProjectReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)              
             show = ProjectReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)             
         else:            
@@ -138,13 +166,45 @@ class ProjectViewSet(viewsets.ModelViewSet):
             data['number'] = request.data['number'] 
         serializer = ProjectSerializer(instance,data=data)        
         if serializer.is_valid():
-            instance = serializer.save()                                                  
+            instance = serializer.save()                
+            instance_id = instance.id
+            picture_delete = request.POST.getlist('pictures_remove', [])
+            for pic in picture_delete:
+                if pic is not None and pic != '':
+                    p = Picture.objects.get(pk=pic)
+                    if p is not None:
+                        p.delete()
+            if 'pictures_add' in request.data and request.data['pictures_add']:
+                images = dict((request.data))['pictures_add']
+                flag = 1
+                arr = []
+                for img_name in images:
+                    # for inst in instance.picture
+                    if img_name:
+                        modified_data = modify_input_project_multiple_files(
+                            instance_id, img_name)
+                        file_serializer = PictureSerializer(data=modified_data)
+
+                    if file_serializer.is_valid():
+                        file_serializer.save()
+                        arr.append(file_serializer.data)
+
+                    else:
+                        flag = 0
+
+                if flag == 1:
+                    show = ProjectReadSerializer(instance)                                 
             show = ProjectReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)        
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def modify_input_project_multiple_files(project_id, proofs):
+    dict = {}
+    dict['project'] = project_id
+    dict['name'] = proofs
+    return dict
 
 class PictureViewSet(viewsets.ModelViewSet):
 
@@ -156,11 +216,6 @@ class PictureViewSet(viewsets.ModelViewSet):
             return PictureReadSerializer
         return PictureSerializer
 
-def modify_input_operation_multiple_files(operation_id, proofs):
-    dict = {}
-    dict['operation'] = operation_id
-    dict['name'] = proofs
-    return dict
 
 #Filtrage paginé des projets
 @api_view(['POST'])

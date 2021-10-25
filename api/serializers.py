@@ -120,9 +120,10 @@ class DomainSerializer(serializers.ModelSerializer):
         fields = '__all__'      
   
 class ProjectReadSerializer(serializers.ModelSerializer): 
+    projectPictures = PictureReadSerializer(many=True, read_only=True)
     class Meta:
         model = Project
-        fields = ('id', 'code', 'name', 'updatedDomain', 'locality', 'year', 'number', 'par', 'longitude', 'latitude', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'code', 'name', 'updatedDomain', 'locality', 'year', 'number', 'par', 'longitude', 'latitude', 'label', 'value', 'projectPictures', 'created_at', 'updated_at')   
         depth = 10
 
 class ProjectSerializer(serializers.ModelSerializer):
