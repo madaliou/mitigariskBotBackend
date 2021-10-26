@@ -87,7 +87,7 @@ class PrefectureViewSet(viewsets.ModelViewSet):
     queryset = Prefecture.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
-            return PrefectureReadSericlasseur_revu_corrige
+            return PrefectureReadSerializer
 
 class CantonViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
