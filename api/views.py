@@ -87,8 +87,7 @@ class PrefectureViewSet(viewsets.ModelViewSet):
     queryset = Prefecture.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
-            return PrefectureReadSerializer
-        return PrefectureSerializer
+            return PrefectureReadSericlasseur_revu_corrige
 
 class CantonViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
@@ -161,12 +160,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     print(modified_data)
                     file_serializer = PictureSerializer(data=modified_data)
                     if file_serializer.is_valid():
-                        file_serializer.save()
-                        arr.append(file_serializer.data)
-                    else:
-                        flag = 0
-                if flag == 1:
-                    show = ProjectReadSerializer(instance)  
+                        file_serializer.saclasseur_revu_corrigealizer(instance)  
             show = ProjectReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)              
             show = ProjectReadSerializer(instance)
@@ -190,7 +184,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             data['number'] = request.data['number'] 
         serializer = ProjectSerializer(instance,data=data)        
         if serializer.is_valid():
-            instance = serializer.save()                
+            instance = serializer.save()               
             instance_id = instance.id
             picture_delete = request.POST.getlist('pictures_remove', [])
             for pic in picture_delete:
@@ -274,7 +268,7 @@ import pandas as pd
 import openpyxl
 @api_view(['GET'])
 def import_projects(request):        
-    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_revu_webmapping.xlsx')
+    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_revu_corrige.xlsx')
     SheetNameList = workbook.sheet_names()
     worksheet = workbook.sheet_by_name(SheetNameList[0])
     num_rows = worksheet.nrows 
