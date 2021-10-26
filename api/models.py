@@ -142,7 +142,7 @@ class Project(TimestampedModel):
     code = models.CharField(max_length=255, unique=True)  
     updatedDomain = models.ForeignKey(Domain, related_name='projectDomain', on_delete=models.CASCADE, null=True)
     locality = models.ForeignKey(Locality, related_name='projectLocality', on_delete=models.CASCADE, null=True)
-    year = models.DateField(null=True)
+    year = models.CharField(max_length=255)  
     number = models.FloatField(default=0) 
     par = models.CharField(max_length=255)  
     longitude = models.CharField(max_length=255)
@@ -154,7 +154,7 @@ class Project(TimestampedModel):
     def value(self):
         return self.id    
     @property
-    def label(self):
+    def position(self):
         tab = []   
         tab.append(self.latitude) 
         tab.append(self.longitude) 

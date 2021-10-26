@@ -82,6 +82,30 @@ class RegionViewSet(viewsets.ModelViewSet):
             return RegionReadSerializer
         return RegionSerializer
 
+class PrefectureViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Prefecture.objects.all()
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return PrefectureReadSerializer
+        return PrefectureSerializer
+
+class CantonViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Canton.objects.all()
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return CantonReadSerializer
+        return CantonSerializer
+
+class CommuneViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Commune.objects.all()
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return CommuneReadSerializer
+        return CommuneSerializer
+
 class LocalityViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     queryset = Locality.objects.all()
@@ -115,7 +139,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 'updatedDomain': request.data['updatedDomain'],
                 'par': request.data['par'],
                 'locality': request.data['locality'],
-                'year': str(request.data['year']) + '-01-01',
+                'year': str(request.data['year']),
                 'longitude': request.data['longitude'],
                 'latitude': request.data['latitude']
 
@@ -158,7 +182,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 'updatedDomain': request.data['updatedDomain'],
                 'par': request.data['par'],
                 'locality': request.data['locality'],
-                'year': str(request.data['year']) + '-01-01',
+                'year': str(request.data['year']),
                 'longitude': request.data['longitude'],
                 'latitude': request.data['latitude']                  
             }
@@ -250,7 +274,7 @@ import pandas as pd
 import openpyxl
 @api_view(['GET'])
 def import_projects(request):        
-    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_defintif_info.xlsx')
+    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_revu_webmapping.xlsx')
     SheetNameList = workbook.sheet_names()
     worksheet = workbook.sheet_by_name(SheetNameList[0])
     num_rows = worksheet.nrows 
@@ -329,10 +353,10 @@ def import_projects(request):
             project.updatedDomain = updatedDomain_R[cell_value_7]
             project.save()
         project.code = cell_value_0
-        project.name = cell_value_5
-        cel = str(cell_value_8)
-        pp = (cel[:4])     
-        project.year = str(pp) + '-01-01'
+        project.name = cell_value_5  
+        tt = str(cell_value_8)
+        ss = tt[:4]
+        project.year = ss
         project.par = cell_value_9
         if cell_value_11 == '':
             project.longitude = 0
@@ -358,9 +382,8 @@ def charts(request):
         year = pro.year
         if year not in dict:
             c = Project.objects.filter(year=pro.year)
-            g = str(pro.year)
-            real = g[:4]
-            tab1.append(real)
+            g = (pro.year)
+            tab1.append(g)
             tab2.append(c.count())
             dict[year] = year
     return Response( {
