@@ -65,7 +65,7 @@ class RegionSerializer(serializers.ModelSerializer):
 class PrefectureReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Prefecture
-        fields = ('id', 'name', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'region', 'value','created_at', 'updated_at')   
         depth = 10
  
    
@@ -78,7 +78,7 @@ class PrefectureSerializer(serializers.ModelSerializer):
 class CommuneReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Commune
-        fields = ('id', 'name', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'value', 'prefecture', 'created_at', 'updated_at')   
         depth = 10
    
 class CommuneSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class CommuneSerializer(serializers.ModelSerializer):
 class CantonReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Canton
-        fields = ('id', 'name', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'commune', 'value','created_at', 'updated_at')   
         depth = 10
    
 class CantonSerializer(serializers.ModelSerializer):
@@ -100,7 +100,7 @@ class CantonSerializer(serializers.ModelSerializer):
 class LocalityReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Locality
-        fields = ('id', 'name', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'value', 'canton', 'created_at', 'updated_at')   
         depth = 10
    
 class LocalitySerializer(serializers.ModelSerializer):
@@ -112,7 +112,7 @@ class LocalitySerializer(serializers.ModelSerializer):
 class DomainReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Domain
-        fields = ('id', 'name', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'value', 'created_at', 'updated_at')   
    
 class DomainSerializer(serializers.ModelSerializer):
     class Meta(object):
