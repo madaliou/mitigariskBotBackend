@@ -152,7 +152,14 @@ class Project(TimestampedModel):
         return self.code
     @property
     def value(self):
+        return self.id  
+    @property
+    def key(self):
         return self.id    
+    @property
+    def content(self):
+        return self.name   
+
     @property
     def position(self):
         tab = []   
