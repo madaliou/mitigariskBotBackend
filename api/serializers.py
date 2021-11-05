@@ -89,7 +89,7 @@ class CommuneSerializer(serializers.ModelSerializer):
 class CantonReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Canton
-        fields = ('id', 'name', 'label', 'commune', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'commune', 'nbOfProjects', 'value','created_at', 'updated_at')   
         depth = 10
    
 class CantonSerializer(serializers.ModelSerializer):
@@ -100,7 +100,7 @@ class CantonSerializer(serializers.ModelSerializer):
 class LocalityReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Locality
-        fields = ('id', 'name', 'label', 'value', 'canton', 'created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'value', 'canton', 'nbOfProjects', 'created_at', 'updated_at')   
         depth = 10
    
 class LocalitySerializer(serializers.ModelSerializer):

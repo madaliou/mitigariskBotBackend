@@ -69,7 +69,6 @@ class Region(TimestampedModel):
     @property
     def label(self):
         return self.name    
-
      
     @property
     def nbOfProjects(self):
@@ -123,6 +122,11 @@ class Canton(TimestampedModel):
     @property
     def label(self):
         return self.name 
+    
+    @property
+    def nbOfProjects(self):
+        nb = Project.objects.filter(locality__canton__id=self.id).count()             
+        return nb
 
 class Locality(TimestampedModel):   
     name = models.CharField(max_length=1024)     
@@ -136,6 +140,11 @@ class Locality(TimestampedModel):
     @property
     def label(self):
         return self.name 
+    
+    @property
+    def nbOfProjects(self):
+        nb = Project.objects.filter(locality__id=self.id).count()             
+        return nb
 
 class Domain(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 

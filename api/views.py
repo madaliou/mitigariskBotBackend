@@ -385,30 +385,18 @@ def charts(request):
         'data' : tab2                   
         })
 
-
 from django.db.models import Sum
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def camembert(request):
     communes = Project.objects.all()
     communeProjects = {}
-
     #total des des frais d'achat par agent
     for commune in communes:
-
         communeProjects[commune.id] = {} 
         som = Project.objects.filter(locality__canton__commune__id=commune.id).count()
-        communeProjects[commune.id] = som
-
-        """ som = Project.objects.filter(locality__canton__commune__id=commune.id).aggregate(Sum('totalAmount'))
-
-
-        communeProjects[commune.id] = som['totalAmount__sum'] if som['totalAmount__sum'] else 0 """     
-    
-    communeProjects['projects'] = CommuneReadSerializer(communes, many=True).data   
-          
-
-
+        communeProjects[commune.id] = som    
+    communeProjects['projects'] = CommuneReadSerializer(communes, many=True).data            
     return Response( {
         'communeProjects' : communeProjects,
         })
