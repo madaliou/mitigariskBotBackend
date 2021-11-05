@@ -68,7 +68,13 @@ class Region(TimestampedModel):
         return self.id    
     @property
     def label(self):
-        return self.name       
+        return self.name    
+
+     
+    @property
+    def nbOfProjects(self):
+        nb = Project.objects.filter(locality__canton__commune__prefecture__region__id=self.id).count()             
+        return nb   
 
 class Prefecture(TimestampedModel):   
     name = models.CharField(max_length=255)     
@@ -82,6 +88,11 @@ class Prefecture(TimestampedModel):
     @property
     def label(self):
         return self.name 
+    
+    @property
+    def nbOfProjects(self):
+        nb = Project.objects.filter(locality__canton__commune__prefecture__id=self.id).count()             
+        return nb
 
 class Commune(TimestampedModel):   
     name = models.CharField(max_length=1024)     

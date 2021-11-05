@@ -55,7 +55,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class RegionReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Region
-        fields = ('id', 'name', 'label', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'value', 'nbOfProjects', 'created_at', 'updated_at')   
    
 class RegionSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -65,7 +65,7 @@ class RegionSerializer(serializers.ModelSerializer):
 class PrefectureReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Prefecture
-        fields = ('id', 'name', 'label', 'region', 'value','created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'region', 'value', 'nbOfProjects', 'created_at', 'updated_at')   
         depth = 10
  
    
