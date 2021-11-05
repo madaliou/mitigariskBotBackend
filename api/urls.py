@@ -29,7 +29,7 @@ urlpatterns = [
     path('projects-filter/', views.projects_filter), 
     path('import-projects/', views.import_projects), 
     path('charts/', views.charts), 
-
+    path('camembert/', views.camembert), 
  
     
 ]

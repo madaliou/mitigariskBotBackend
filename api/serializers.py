@@ -78,7 +78,7 @@ class PrefectureSerializer(serializers.ModelSerializer):
 class CommuneReadSerializer(serializers.ModelSerializer):   
     class Meta:
         model = Commune
-        fields = ('id', 'name', 'label', 'value', 'prefecture', 'created_at', 'updated_at')   
+        fields = ('id', 'name', 'label', 'value', 'nbOfProjects', 'prefecture', 'created_at', 'updated_at')   
         depth = 10
    
 class CommuneSerializer(serializers.ModelSerializer):

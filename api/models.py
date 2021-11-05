@@ -94,6 +94,11 @@ class Commune(TimestampedModel):
     @property
     def label(self):
         return self.name 
+    
+    @property
+    def nbOfProjects(self):
+        nb = Project.objects.filter(locality__canton__commune__id=self.id).count()             
+        return nb
 
 class Canton(TimestampedModel):   
     name = models.CharField(max_length=255)     
