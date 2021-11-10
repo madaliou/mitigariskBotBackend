@@ -268,7 +268,7 @@ import pandas as pd
 import openpyxl
 @api_view(['GET'])
 def import_projects(request):        
-    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_revu_corrige281021.xlsx')
+    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_revu_corrige091121.xlsx')
     SheetNameList = workbook.sheet_names()
     worksheet = workbook.sheet_by_name(SheetNameList[0])
     num_rows = worksheet.nrows 
