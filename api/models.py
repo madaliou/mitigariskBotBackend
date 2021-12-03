@@ -39,7 +39,6 @@ class UserProfile(AbstractUser):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     username = models.CharField(max_length=255, unique=True, blank=True)
-    birthDate = models.DateField(_("Date de naissance"), blank=True, null=True) 
     passwordChanged = models.BooleanField(default=False)   
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children', null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

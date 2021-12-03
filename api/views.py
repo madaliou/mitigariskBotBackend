@@ -68,7 +68,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
   
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
-
+    pagination_class = None
     def get_serializer_class(self):
         if self.request.method in ['GET']:
             return UserProfileReadSerializer
@@ -76,6 +76,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 class RegionViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
+    pagination_class = None
+
     queryset = Region.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -84,6 +86,8 @@ class RegionViewSet(viewsets.ModelViewSet):
 
 class PrefectureViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
+    pagination_class = None
+
     queryset = Prefecture.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -91,6 +95,7 @@ class PrefectureViewSet(viewsets.ModelViewSet):
 
 class CantonViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
+    pagination_class = None
     queryset = Canton.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -99,6 +104,7 @@ class CantonViewSet(viewsets.ModelViewSet):
 
 class CommuneViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
+    pagination_class = None
     queryset = Commune.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -107,6 +113,18 @@ class CommuneViewSet(viewsets.ModelViewSet):
 
 class LocalityViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
+    pagination_class = None
+
+    queryset = Locality.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return LocalityReadSerializer
+        return LocalitySerializer
+
+class PaginatedLocalityViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+
     queryset = Locality.objects.all()
 
     def get_serializer_class(self):
@@ -115,6 +133,8 @@ class LocalityViewSet(viewsets.ModelViewSet):
         return LocalitySerializer
 
 class DomainViewSet(viewsets.ModelViewSet):
+    pagination_class = None
+
     queryset = Domain.objects.all()
 
     def get_serializer_class(self):
@@ -122,8 +142,20 @@ class DomainViewSet(viewsets.ModelViewSet):
             return DomainReadSerializer
         return DomainSerializer
 
+class PaginatedProjectViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Project.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return ProjectReadSerializer
+        return ProjectSerializer
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
+    pagination_class = None
+
     queryset = Project.objects.all()
 
     def get_serializer_class(self):
@@ -225,6 +257,8 @@ def modify_input_project_multiple_files(project_id, proofs):
     return dict
 
 class PictureViewSet(viewsets.ModelViewSet):
+    pagination_class = None
+
 
     queryset = Picture.objects.all()
 
@@ -268,7 +302,7 @@ import pandas as pd
 import openpyxl
 @api_view(['GET'])
 def import_projects(request):        
-    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/classeur_revu_corrige091121.xlsx')
+    workbook = xlrd.open_workbook('/home/moozistudio/Bureau/Untitled spreadsheet.xlsx')
     SheetNameList = workbook.sheet_names()
     worksheet = workbook.sheet_by_name(SheetNameList[0])
     num_rows = worksheet.nrows 
@@ -406,9 +440,6 @@ def camembert(request):
 def get_user(request):
     serializer = UserProfileSerializer(request.user)
     return Response(serializer.data)
-
-
-
  
 
 

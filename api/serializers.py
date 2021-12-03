@@ -28,13 +28,13 @@ class CustomTokenSerializer(serializers.Serializer):
 class UserProfileReadSerializer(serializers.ModelSerializer):  
     class Meta:
         model = UserProfile
-        fields = ('id', 'first_name', 'last_name', 'username', 'fullName', 'email', 'phoneNumber', 'birthDate', 'role', 'passwordChanged', 'value', 'label','author', 'created_at', 'updated_at')   
+        fields = ('id', 'first_name', 'last_name', 'username', 'fullName', 'email', 'phoneNumber', 'role', 'passwordChanged', 'value', 'label','author', 'created_at', 'updated_at')   
  
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserProfile
         #extra_kwargs = {'password': {'write_only': True}}
-        fields = ('first_name', 'last_name', 'username', 'email', 'phoneNumber', 'fullName', 'birthDate', 'role', 'passwordChanged')
+        fields = ('first_name', 'last_name', 'username', 'email', 'phoneNumber', 'fullName', 'role', 'passwordChanged')
     
     def create(self, validated_data):
         user = super().create(validated_data)
