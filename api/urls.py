@@ -11,13 +11,11 @@ router = DefaultRouter()
 router.register('users', views.UserProfileViewSet, basename='users')
 router.register('domains', views.DomainViewSet, basename='domains')
 router.register('projects', views.ProjectViewSet, basename='projects')
-router.register('paginated-projects', views.PaginatedProjectViewSet, basename='paginated-projects')
 router.register('regions', views.RegionViewSet, basename='regions')
 router.register('prefectures', views.PrefectureViewSet, basename='prefectures')
 router.register('cantons', views.CantonViewSet, basename='cantons')
 router.register('communes', views.CommuneViewSet, basename='communes')
 router.register('localities', views.LocalityViewSet, basename='localities')
-router.register('paginated-localities', views.PaginatedLocalityViewSet, basename='paginated-localities')
 
 
 
@@ -28,6 +26,10 @@ urlpatterns = [
     path('import-projects/', views.import_projects), 
     path('charts/', views.charts), 
     path('camembert/', views.camembert), 
+    path('paginated-projects/', views.paginated_projects), 
+    path('paginated-localities/', views.paginated_localities), 
+
+
  
     
 ]

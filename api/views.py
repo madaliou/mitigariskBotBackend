@@ -68,7 +68,6 @@ def jwt_response_payload_handler(token, user=None, request=None):
   
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
-    pagination_class = None
     def get_serializer_class(self):
         if self.request.method in ['GET']:
             return UserProfileReadSerializer
@@ -76,8 +75,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 class RegionViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    pagination_class = None
-
+    
     queryset = Region.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -86,8 +84,7 @@ class RegionViewSet(viewsets.ModelViewSet):
 
 class PrefectureViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    pagination_class = None
-
+    
     queryset = Prefecture.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -95,7 +92,6 @@ class PrefectureViewSet(viewsets.ModelViewSet):
 
 class CantonViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    pagination_class = None
     queryset = Canton.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -104,7 +100,6 @@ class CantonViewSet(viewsets.ModelViewSet):
 
 class CommuneViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    pagination_class = None
     queryset = Commune.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
@@ -113,18 +108,7 @@ class CommuneViewSet(viewsets.ModelViewSet):
 
 class LocalityViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    pagination_class = None
-
-    queryset = Locality.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.method in ['GET']:
-            return LocalityReadSerializer
-        return LocalitySerializer
-
-class PaginatedLocalityViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
-
+    
     queryset = Locality.objects.all()
 
     def get_serializer_class(self):
@@ -133,8 +117,7 @@ class PaginatedLocalityViewSet(viewsets.ModelViewSet):
         return LocalitySerializer
 
 class DomainViewSet(viewsets.ModelViewSet):
-    pagination_class = None
-
+    
     queryset = Domain.objects.all()
 
     def get_serializer_class(self):
@@ -142,20 +125,9 @@ class DomainViewSet(viewsets.ModelViewSet):
             return DomainReadSerializer
         return DomainSerializer
 
-class PaginatedProjectViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
-    queryset = Project.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.method in ['GET']:
-            return ProjectReadSerializer
-        return ProjectSerializer
-
-
 class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    pagination_class = None
-
+    
     queryset = Project.objects.all()
 
     def get_serializer_class(self):
@@ -257,8 +229,7 @@ def modify_input_project_multiple_files(project_id, proofs):
     return dict
 
 class PictureViewSet(viewsets.ModelViewSet):
-    pagination_class = None
-
+    
 
     queryset = Picture.objects.all()
 
@@ -434,6 +405,36 @@ def camembert(request):
     return Response( {
         'communeProjects' : communeProjects,
         })
+
+#projets paginés
+@api_view(['GET'])
+def paginated_projects(request):    
+    projects = Project.objects.all()
+    if len(projects)> 0:
+        paginator = StandardResultsSetPagination()
+        result_page = paginator.paginate_queryset(projects, request)
+        serializer = ProjectReadSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    else:
+        return Response([],status=status.HTTP_200_OK) 
+
+#projets paginés
+@api_view(['GET'])
+def paginated_localities(request):
+    localities = Locality.objects.all()
+    if len(localities)> 0:
+        paginator = StandardResultsSetPagination()
+        result_page = paginator.paginate_queryset(localities, request)
+        serializer = LocalityReadSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    else:
+        return Response([],status=status.HTTP_200_OK) 
+
+class StandardResultsSetPagination(pagination.PageNumberPagination):
+    page_size = 50
+    page_query_param = 'page'
+    page_size_query_param = 'perPage'
+    max_page_size = 20000  
 
 
 @api_view(['GET'])
