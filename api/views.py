@@ -248,8 +248,8 @@ def projects_filter(request):
         data['year'] = request.data['year']
     if 'updatedDomain' in request.data and request.data['updatedDomain']:
         data['updatedDomain'] = request.data['updatedDomain']      
-    """ if 'q' in request.data and request.data['q']:
-        data['wording__icontains'] = str(request.data['q']) """
+    if 'q' in request.data and request.data['q']:
+        data['code__icontains'] = str(request.data['q'])
     projects = Project.objects.filter(**data)  
 
     if len(projects)> 0:
