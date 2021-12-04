@@ -245,12 +245,12 @@ class PictureViewSet(viewsets.ModelViewSet):
 def projects_filter(request):  
     data = {}
     if 'year' in request.data and request.data['year']:
-        data['year__year'] = request.data['year']
+        data['year'] = request.data['year']
     if 'updatedDomain' in request.data and request.data['updatedDomain']:
         data['updatedDomain'] = request.data['updatedDomain']      
     """ if 'q' in request.data and request.data['q']:
         data['wording__icontains'] = str(request.data['q']) """
-    projects = Project.objects.filter(**data)  @permission_classes([AllowAny])
+    projects = Project.objects.filter(**data)  
 
     if len(projects)> 0:
         paginator = StandardResultsSetPagination()
