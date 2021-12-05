@@ -221,7 +221,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 def modify_input_project_multiple_files(project_id, proofs):
     dict = {}
     dict['project'] = project_id
@@ -238,7 +237,6 @@ class PictureViewSet(viewsets.ModelViewSet):
         if self.request.method in ['GET']:
             return PictureReadSerializer
         return PictureSerializer
-
 
 #Filtrage paginé des projets
 @api_view(['POST'])
@@ -260,12 +258,35 @@ def projects_filter(request):
     else:
         return Response([],status=status.HTTP_200_OK) 
 
+#Filtrage paginé des localités
+@api_view(['POST'])
+def localities_filter(request):  
+    data = {}
+    if 'canton' in request.data and request.data['canton']:
+        data['canton_id'] = request.data['canton']
+    if 'commune' in request.data and request.data['commune']:
+        data['canton__commune_id'] = request.data['commune']
+    if 'prefecture' in request.data and request.data['prefecture']:
+        data['canton__commune__prefecture_id'] = request.data['prefecture']  
+    if 'region' in request.data and request.data['region']:
+        data['canton__commune__prefecture__region_id'] = request.data['region']          
+    if 'q' in request.data and request.data['q']:
+        data['name__icontains'] = str(request.data['q'])
+    localities = Locality.objects.filter(**data)  
+
+    if len(localities)> 0:
+        paginator = StandardResultsSetPagination()
+        result_page = paginator.paginate_queryset(localities, request)
+        serializer = LocalityReadSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    else:
+        return Response([],status=status.HTTP_200_OK) 
+
 class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_size = 50
     page_query_param = 'page'
     page_size_query_param = 'perPage'
     max_page_size = 20000  
-
 
 import dateutil.parser
 import os.path
@@ -435,7 +456,6 @@ class StandardResultsSetPagination(pagination.PageNumberPagination):
     page_query_param = 'page'
     page_size_query_param = 'perPage'
     max_page_size = 20000  
-
 
 @api_view(['GET'])
 def get_user(request):
