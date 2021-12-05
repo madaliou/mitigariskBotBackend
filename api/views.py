@@ -5,7 +5,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.context import RequestContext
 from django.urls.base import translate_url
 from .models import UserProfile, Project, Domain, Picture, Region, Prefecture, Commune, Canton, Locality
-from .serializers import UserProfileSerializer, UserProfileReadSerializer, ProjectSerializer, ProjectReadSerializer, DomainSerializer, DomainReadSerializer
+from .serializers import UserProfileSerializer, UserProfileReadSerializer, ProjectSerializer, ProjectReadSerializer, DomainSerializer, DomainReadSerializer, ChangePasswordSerializer
 from .serializers import PictureSerializer, PictureReadSerializer, RegionReadSerializer, RegionSerializer, PrefectureSerializer, PrefectureReadSerializer
 from .serializers import CommuneSerializer, CommuneReadSerializer, CantonSerializer, CantonReadSerializer, LocalitySerializer, LocalityReadSerializer
 
@@ -220,6 +220,42 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return Response(show.data, status=status.HTTP_201_CREATED)        
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Changement de mot de passe
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    model = User
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Verifier le nombre de caractère du mot de passe
+            if len(request.data['password']) < 8:
+                return Response({"message": ["Ce mot de passe est trop court. Il doit contenir au minimum 8 caractères!"]}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Verifier l'ancien mot de passe
+            if self.object.check_password(serializer.data.get("password")):
+                return Response({"message": ["Veuillez choisir un mot de passe autre que l'ancien !"]}, status=status.HTTP_400_BAD_REQUEST)
+
+            self.object.set_password(serializer.data.get("password"))
+            self.object.passwordChanged = 1
+            self.object.save()
+            response = {
+                'status': 'success',
+                'code': status.HTTP_200_OK,
+                'message': 'Mot de passe changé avec succès',
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def modify_input_project_multiple_files(project_id, proofs):
     dict = {}

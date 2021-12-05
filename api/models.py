@@ -14,6 +14,7 @@ from django.utils import timezone
 
 ROLECHOICES = (
     ('admin', 'Administrateur'),
+    ('user', 'Utilisateur'),
 
 )
 

@@ -6,6 +6,9 @@ from .models import UserProfile, Picture, Domain, Project, Region, Prefecture, C
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
+from django.template.loader import render_to_string, get_template
+from django.core.mail import EmailMessage
+
 
 class PictureSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,11 +40,42 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'last_name', 'username', 'email', 'phoneNumber', 'fullName', 'role', 'passwordChanged')
     
     def create(self, validated_data):
-        user = super().create(validated_data)
-        user.set_password('admin123')
+        
         if validated_data['role']=='admin':
+            user = super().create(validated_data)
+            user.set_password('admin123')
             user.passwordChanged = True
+        if validated_data['role'] == 'user':
+            user = super().create(validated_data)
+            password = UserProfile.objects.make_random_password(length=8,
+                                                                allowed_chars='abcdefghijklmnopqrstuvwxyz'
+                                                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+            objet = 'Geoloc'
+                #passwordSend = password
+
+                ##context={'user_name': validated_data['username']}
+
+            ctx = {
+                'first_name': validated_data['first_name'],
+                'last_name': validated_data['last_name'],
+                'user_name': validated_data['username'],
+                'password': password
+            }
+            message = get_template('email/mail_template.html').render(ctx)
+            msg = EmailMessage(
+                objet,
+                message,
+                'agodeeli89@gmail.com',
+                [validated_data['email']],
+            )
+            msg.content_subtype = "html"  # Main content is now text/html
+            msg.send()
+            user.set_password(password)
+            user.save()
+            print("Mail successfully sent")
         user.save()
+        
+
         return user
     
     def update(self, instance, validated_data):
@@ -130,3 +164,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = '__all__'      
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = UserProfile
+
+    password = serializers.CharField(required=True)
