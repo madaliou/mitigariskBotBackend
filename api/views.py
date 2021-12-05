@@ -257,6 +257,8 @@ class ChangePasswordView(generics.UpdateAPIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 def modify_input_project_multiple_files(project_id, proofs):
     dict = {}
     dict['project'] = project_id
@@ -314,6 +316,25 @@ def localities_filter(request):
         paginator = StandardResultsSetPagination()
         result_page = paginator.paginate_queryset(localities, request)
         serializer = LocalityReadSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    else:
+        return Response([],status=status.HTTP_200_OK) 
+
+#Filtrage paginé des localités
+@api_view(['POST'])
+def users_filter(request):  
+    data = {}
+
+    if 'role' in request.data and request.data['role']:
+        data['role'] = request.data['role']          
+    if 'q' in request.data and request.data['q']:
+        data['first_name__icontains'] = str(request.data['q'])
+    users = UserProfile.objects.filter(**data)  
+
+    if len(users)> 0:
+        paginator = StandardResultsSetPagination()
+        result_page = paginator.paginate_queryset(users, request)
+        serializer = UserProfileReadSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
     else:
         return Response([],status=status.HTTP_200_OK) 

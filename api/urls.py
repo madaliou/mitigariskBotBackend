@@ -6,6 +6,8 @@ from api import views
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 from rest_framework.routers import DefaultRouter
 from . import views as acc_views
+from .views import ChangePasswordView
+
 
 router = DefaultRouter()
 router.register('users', views.UserProfileViewSet, basename='users')
@@ -24,11 +26,14 @@ urlpatterns = [
     path('login/', obtain_jwt_token),
     path('projects-filter/', views.projects_filter), 
     path('localities-filter/', views.localities_filter),
+    path('users-filter/', views.users_filter), 
     path('import-projects/', views.import_projects), 
     path('charts/', views.charts), 
     path('camembert/', views.camembert), 
     path('paginated-projects/', views.paginated_projects), 
     path('paginated-localities/', views.paginated_localities), 
+    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+
 
 
  
