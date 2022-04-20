@@ -89,7 +89,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             msg = EmailMessage(
                 objet,
                 message,
-                'agodeeli89@gmail.com',
+                'test.transvie@gmail.com',
                 [validated_data['email']],
             )
             msg.content_subtype = "html"  # Main content is now text/html
