@@ -11,6 +11,8 @@ from safedelete.models import SafeDeleteModel
 from safedelete.models import HARD_DELETE_NOCASCADE
 from datetime import datetime, date
 from django.utils import timezone
+from rest_framework.response import Response
+
 
 ROLECHOICES = (
     ('admin', 'Administrateur'),
@@ -33,17 +35,23 @@ class TimestampedModel(SafeDeleteModel):
         abstract = True
         ordering = ['-id']
 
+
+class Company(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    name = models.CharField(max_length=255) 
+    description = models.CharField(max_length=1024, null=True)  
+
+
 class UserProfile(AbstractUser):
     email = models.EmailField(max_length=70,blank=True, unique=True)
-    phoneNumber = models.CharField(max_length=20, null=True, unique=True)
     role = models.CharField(_("Role"), max_length=255, choices=ROLECHOICES, blank=True) 
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
-    username = models.CharField(max_length=255, unique=True, blank=True)
     passwordChanged = models.BooleanField(default=False)   
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children', null=True, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, related_name='users', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)   
    
     class Meta:
         ordering = ['-id']      
@@ -57,144 +65,21 @@ class UserProfile(AbstractUser):
     @property
     def label(self):
         return self.name 
+ 
 
-class Region(TimestampedModel):   
-    name = models.CharField(max_length=255)  
+class Category(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    name = models.CharField(max_length=255)
+
+class Ticket(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    description = models.CharField(max_length=1024)  
+    category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
    
-    def __str__(self):
-        return self.name  
-    @property
-    def value(self):
-        return self.id    
-    @property
-    def label(self):
-        return self.name    
-     
-    @property
-    def nbOfProjects(self):
-        nb = Project.objects.filter(locality__canton__commune__prefecture__region__id=self.id).count()             
-        return nb   
-
-class Prefecture(TimestampedModel):   
-    name = models.CharField(max_length=255)     
-    region = models.ForeignKey(Region, related_name='region', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
-    @property
-    def value(self):
-        return self.id    
-    @property
-    def label(self):
-        return self.name 
-    
-    @property
-    def nbOfProjects(self):
-        nb = Project.objects.filter(locality__canton__commune__prefecture__id=self.id).count()             
-        return nb
-
-class Commune(TimestampedModel):   
-    name = models.CharField(max_length=1024)     
-    prefecture = models.ForeignKey(Prefecture, related_name='prefecture', on_delete=models.CASCADE, null=True)
-    def __str__(self):
-        return self.name
-    @property
-    def value(self):
-        return self.id    
-    @property
-    def label(self):
-        return self.name 
-    
-    @property
-    def nbOfProjects(self):
-        nb = Project.objects.filter(locality__canton__commune__id=self.id).count()             
-        return nb
-
-class Canton(TimestampedModel):   
-    name = models.CharField(max_length=255)     
-    commune = models.ForeignKey(Commune, related_name='commune', on_delete=models.CASCADE)
-  
-    def __str__(self):
-        return self.name
-    @property
-    def value(self):
-        return self.id    
-    @property
-    def label(self):
-        return self.name 
-    
-    @property
-    def nbOfProjects(self):
-        nb = Project.objects.filter(locality__canton__id=self.id).count()             
-        return nb
-
-class Locality(TimestampedModel):   
-    name = models.CharField(max_length=1024)     
-    canton = models.ForeignKey(Canton, related_name='canton', on_delete=models.CASCADE)
-  
-    def __str__(self):
-        return self.name
-    @property
-    def value(self):
-        return self.id    
-    @property
-    def label(self):
-        return self.name 
-    
-    @property
-    def nbOfProjects(self):
-        nb = Project.objects.filter(locality__id=self.id).count()             
-        return nb
-
-class Domain(TimestampedModel):   
-    _safedelete_policy = HARD_DELETE_NOCASCADE 
-    name = models.CharField(max_length=1024) 
-
-    def __str__(self):
-        return self.name
-    @property
-    def value(self):
-        return self.id    
-    @property
-    def label(self):
-        return self.name   
-
-from rest_framework.response import Response
-
-class Project(TimestampedModel):   
-    _safedelete_policy = HARD_DELETE_NOCASCADE 
-    name = models.CharField(max_length=1024)  
-    code = models.CharField(max_length=255, unique=True)  
-    updatedDomain = models.ForeignKey(Domain, related_name='projectDomain', on_delete=models.CASCADE, null=True)
-    locality = models.ForeignKey(Locality, related_name='projectLocality', on_delete=models.CASCADE, null=True)
-    year = models.CharField(max_length=255)  
-    number = models.FloatField(default=0) 
-    par = models.CharField(max_length=255)  
-    longitude = models.CharField(max_length=255)
-    latitude = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.code
-    @property
-    def value(self):
-        return self.id  
-    @property
-    def key(self):
-        return self.id    
-    @property
-    def content(self):
-        return self.name   
-
-    @property
-    def position(self):
-        tab = []   
-        tab.append(self.latitude) 
-        tab.append(self.longitude) 
-        return tab
 
 class Picture(TimestampedModel):
     name = models.ImageField(upload_to='uploads/images/', blank=True)  
-    project = models.ForeignKey(Project, related_name='projectPictures', null = True, on_delete=models.CASCADE)
+    #project = models.ForeignKey(Project, related_name='projectPictures', null = True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['name']

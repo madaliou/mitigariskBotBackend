@@ -7,31 +7,26 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify
 from rest_framework.routers import DefaultRouter
 from . import views as acc_views
 from .views import ChangePasswordView
+from api.views import RegisterView
+
 
 
 router = DefaultRouter()
 router.register('users', views.UserProfileViewSet, basename='users')
-router.register('domains', views.DomainViewSet, basename='domains')
-router.register('projects', views.ProjectViewSet, basename='projects')
-router.register('regions', views.RegionViewSet, basename='regions')
-router.register('prefectures', views.PrefectureViewSet, basename='prefectures')
-router.register('cantons', views.CantonViewSet, basename='cantons')
-router.register('communes', views.CommuneViewSet, basename='communes')
-router.register('localities', views.LocalityViewSet, basename='localities')
+router.register('categories', views.CategoryViewSet, basename='categories')
+router.register('companies', views.CompanyViewSet, basename='companies')
+router.register('tickets', views.TicketViewSet, basename='tickets')
+path('register/', RegisterView.as_view(), name='auth_register'),   
+
+
+#router.register('domains', views.DomainViewSet, basename='domains')
+
 
 
 
 urlpatterns = [    
     path('', include(router.urls)),
     path('login/', obtain_jwt_token),
-    path('projects-filter/', views.projects_filter), 
-    path('localities-filter/', views.localities_filter),
-    path('users-filter/', views.users_filter), 
-    path('import-projects/', views.import_projects), 
-    path('charts/', views.charts), 
-    path('camembert/', views.camembert), 
-    path('paginated-projects/', views.paginated_projects), 
-    path('paginated-localities/', views.paginated_localities), 
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
 
 
