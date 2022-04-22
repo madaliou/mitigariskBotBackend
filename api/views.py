@@ -124,6 +124,7 @@ class TicketViewSet(viewsets.ModelViewSet):
             'author': request.user.id
 
         }
+        print('ccccccccccccccccccccccccc', request.data['category'],)
         serializer = TicketReadSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save() 

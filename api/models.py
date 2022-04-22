@@ -78,7 +78,7 @@ class Ticket(TimestampedModel):
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     description = models.CharField(max_length=1024)  
     fixed = models.BooleanField(default=False)
-    category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)
     
 
