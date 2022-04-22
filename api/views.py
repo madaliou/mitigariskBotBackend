@@ -81,7 +81,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return CategorySerializer
 
 class CompanyViewSet(viewsets.ModelViewSet):
-
+    permission_classes = (AllowAny,)
     queryset = Company.objects.all().order_by('-id') 
 
     def get_serializer_class(self):
