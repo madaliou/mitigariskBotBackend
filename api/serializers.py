@@ -30,21 +30,29 @@ class CustomTokenSerializer(serializers.Serializer):
     token = serializers.CharField()
 
 
-class CompanyReadSerializer(serializers.ModelSerializer):   
+class CompanyReadSerializer(serializers.ModelSerializer):  
+    #users = UserProfileReadSerializer(many=True, read_only=True) 
     class Meta:
         model = Company
-        fields = ('id', 'name', 'created_at', 'updated_at')   
+        fields = ('id', 'name', 'description', 'created_at', 'updated_at')   
    
 class CompanySerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Company
         fields = '__all__'
 
+class TicketReadSerializer(serializers.ModelSerializer):  
+    class Meta:
+        model = Ticket
+        fields = '__all__'          
+        depth = 10
+
 class UserProfileReadSerializer(serializers.ModelSerializer):  
     company = CompanyReadSerializer(many=True, read_only=True)
+    tickets = TicketReadSerializer(many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'created_at', 'updated_at')   
+        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'tickets', 'created_at', 'updated_at')   
  
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta(object):
@@ -136,8 +144,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
 
-        )
-        
+        )        
         user.set_password(validated_data['password'])
         user.role = 'contributor'
         user.save()
@@ -164,7 +171,8 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'          
 
-class TicketReadSerializer(serializers.ModelSerializer):   
+class TicketReadSerializer(serializers.ModelSerializer):  
+    author = UserProfileReadSerializer(many=False, read_only=True) 
     class Meta:
         model = Ticket
         fields = '__all__'          
@@ -174,7 +182,7 @@ class TicketReadSerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Ticket
-        fields = '__all__'          
+        fields = ('id','description', 'category')
 
 
 

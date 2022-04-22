@@ -68,26 +68,6 @@ def jwt_response_payload_handler(token, user=None, request=None):
         'userData': UserProfileReadSerializer(user, context={'request': request}).data
     }
 
-  
-class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = UserProfile.objects.all()
-    def get_serializer_class(self):
-        if self.request.method in ['GET']:
-            return UserProfileReadSerializer
-        return UserProfileSerializer
-
-
-class CompanyViewSet(viewsets.ModelViewSet):
-
-    queryset = Company.objects.all().order_by('-id') 
-
-    def get_serializer_class(self):
-        
-        if self.request.method in ['GET']:
-            
-            return CompanyReadSerializer
-        return CompanySerializer
-
 
 class CategoryViewSet(viewsets.ModelViewSet):
 
@@ -100,113 +80,77 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return CategoryReadSerializer
         return CategorySerializer
 
-class TicketViewSet(viewsets.ModelViewSet):
+class CompanyViewSet(viewsets.ModelViewSet):
 
-    queryset = Ticket.objects.all().order_by('-id') 
+    queryset = Company.objects.all().order_by('-id') 
 
     def get_serializer_class(self):
         
         if self.request.method in ['GET']:
             
-            return TicketReadSerializer
-        return TicketSerializer
+            return CompanyReadSerializer
+        return CompanySerializer
 
-
-""" class ProjectViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
-    
-    queryset = Project.objects.all()
-
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
     def get_serializer_class(self):
         if self.request.method in ['GET']:
-            return ProjectReadSerializer
-        return ProjectSerializer
-    
-    def create(self, request, *args, **kwargs):        
-        data = { 
-                'code': request.data['code'],
-                'name': request.data['name'],
-                'updatedDomain': request.data['updatedDomain'],
-                'par': request.data['par'],
-                'locality': request.data['locality'],
-                'year': str(request.data['year']),
-                'longitude': request.data['longitude'],
-                'latitude': request.data['latitude']
+            return UserProfileReadSerializer
+        return UserProfileSerializer
 
-            }   
-        if 'number' in request.data and request.data['number']:
-            data['number'] = request.data['number']         
-        serializer = ProjectSerializer(data=data)          
+
+class TicketViewSet(viewsets.ModelViewSet):
+    queryset = Ticket.objects.all()
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return TicketReadSerializer
+        return TicketSerializer
+    """ serializer_class = Ticket
+
+    def get_queryset(self):
+        if (self.request.user.role == 'admin'):
+            recipients = UserProfile.objects.filter(Q(role='recipient'))
+            return recipients
+
+        else:
+            recipients = UserProfile.objects.filter(
+                Q(role='recipient') & Q(parent_id=self.request.user.id))
+            return recipients """
+
+    def create(self, request, *args, **kwargs):    
+        data = {
+            'category': request.data['category'],          
+            'description': request.data['description'],            
+            'author': request.user.id
+
+        }
+        serializer = TicketReadSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save() 
-            instance_id = instance.id 
-            if 'proofs' in request.data and request.data['proofs']:
-
-                images = dict((request.data).lists())['proofs']
-                flag = 1
-                arr = []
-                for img_name in images:
-                    modified_data = modify_input_project_multiple_files(
-                        instance_id, img_name)
-                    print(modified_data)
-                    file_serializer = PictureSerializer(data=modified_data)
-                    if file_serializer.is_valid():
-                        file_serializer.saclasseur_revu_corrigealizer(instance)  
-            show = ProjectReadSerializer(instance)
-            return Response(show.data, status=status.HTTP_201_CREATED)              
-            show = ProjectReadSerializer(instance)
-            return Response(show.data, status=status.HTTP_201_CREATED)             
-        else:            
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
-            
-    def update(self, request, *args, **kwargs):     
-        instance = self.get_object()  
-        data = {
-                'code': request.data['code'],
-                'name': request.data['name'],
-                'updatedDomain': request.data['updatedDomain'],
-                'par': request.data['par'],
-                'locality': request.data['locality'],
-                'year': str(request.data['year']),
-                'longitude': request.data['longitude'],
-                'latitude': request.data['latitude']                  
-            }
-        if 'number' in request.data and request.data['number']:
-            data['number'] = request.data['number'] 
-        serializer = ProjectSerializer(instance,data=data)        
-        if serializer.is_valid():
-            instance = serializer.save()               
-            instance_id = instance.id
-            picture_delete = request.POST.getlist('pictures_remove', [])
-            for pic in picture_delete:
-                if pic is not None and pic != '':
-                    p = Picture.objects.get(pk=pic)
-                    if p is not None:
-                        p.delete()
-            if 'pictures_add' in request.data and request.data['pictures_add']:
-                images = dict((request.data))['pictures_add']
-                flag = 1
-                arr = []
-                for img_name in images:
-                    # for inst in instance.picture
-                    if img_name:
-                        modified_data = modify_input_project_multiple_files(
-                            instance_id, img_name)
-                        file_serializer = PictureSerializer(data=modified_data)
-
-                    if file_serializer.is_valid():
-                        file_serializer.save()
-                        arr.append(file_serializer.data)
-
-                    else:
-                        flag = 0
-
-                if flag == 1:
-                    show = ProjectReadSerializer(instance)                                 
-            show = ProjectReadSerializer(instance)
-            return Response(show.data, status=status.HTTP_201_CREATED)        
+            instance.category = Category.objects.get(id = request.data['category'] )       
+            instance.author = request.user   
+            instance.save()
+            show = TicketReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = {
+            'category': request.data['category'],
+            'description': request.data['description'],            
+            'author': request.user.id
+        }
+        serializer = TicketReadSerializer(instance, data=data)
+        if serializer.is_valid():
+            instance = serializer.save()   
+            instance.category = Category.objects.get(id = request.data['category'] )       
+            instance.author = request.user         
+            instance.save()
+            show = TicketReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Changement de mot de passe
 class ChangePasswordView(generics.UpdateAPIView):
@@ -221,16 +165,13 @@ class ChangePasswordView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data)
-
         if serializer.is_valid():
             # Verifier le nombre de caractère du mot de passe
             if len(request.data['password']) < 8:
                 return Response({"message": ["Ce mot de passe est trop court. Il doit contenir au minimum 8 caractères!"]}, status=status.HTTP_400_BAD_REQUEST)
-
             # Verifier l'ancien mot de passe
             if self.object.check_password(serializer.data.get("password")):
                 return Response({"message": ["Veuillez choisir un mot de passe autre que l'ancien !"]}, status=status.HTTP_400_BAD_REQUEST)
-
             self.object.set_password(serializer.data.get("password"))
             self.object.passwordChanged = 1
             self.object.save()
@@ -239,11 +180,7 @@ class ChangePasswordView(generics.UpdateAPIView):
                 'code': status.HTTP_200_OK,
                 'message': 'Mot de passe changé avec succès',
             }
-
             return Response(response)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -39,7 +39,8 @@ class TimestampedModel(SafeDeleteModel):
 class Company(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=255) 
-    description = models.CharField(max_length=1024, null=True)  
+    description = models.CharField(max_length=1024)  
+
 
 
 class UserProfile(AbstractUser):
@@ -70,11 +71,15 @@ class UserProfile(AbstractUser):
 class Category(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=255)
+    description = models.CharField(max_length=1024, null=True)  
+
 
 class Ticket(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     description = models.CharField(max_length=1024)  
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)
+
    
 
 class Picture(TimestampedModel):
