@@ -28,6 +28,9 @@ urlpatterns = [
     path('', include(router.urls)),
     path('login/', obtain_jwt_token),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('fix_ticket/', views.fix_ticket),
+    path('fixed_tickets/', views.fixed_tickets),
+    path('unfixed_tickets/', views.unfixed_tickets),
 
 
 

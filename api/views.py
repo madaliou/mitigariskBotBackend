@@ -193,8 +193,32 @@ class RegisterView(generics.CreateAPIView):
 def get_user(request):
     serializer = UserProfileSerializer(request.user)
     return Response(serializer.data)
- 
+
+# Traiter un tiquet
+@api_view(['POST'])
+def fix_ticket(request):
+    ticket = Ticket.objects.get(id=request.data['ticket'])   
+    if ticket is not None :
+        if ticket.fixed == 0:        
+            ticket.fixed=1
+        else:
+            ticket.fixed=0           
+    ticket.save()                  
+    serializer = TicketReadSerializer(ticket, many=False)    
+    return Response(serializer.data)
 
 
+# tiquets traités
+@api_view(['GET'])
+def fixed_tickets(request):
+    ticket = Ticket.objects.Filter(fixed=True)                     
+    serializer = TicketReadSerializer(ticket, many=True)    
+    return Response(serializer.data)
 
 
+# tiquets non traités
+@api_view(['GET'])
+def unfixed_tickets(request):
+    ticket = Ticket.objects.filter(fixed=False)                     
+    serializer = TicketReadSerializer(ticket, many=True)    
+    return Response(serializer.data)
