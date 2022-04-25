@@ -212,7 +212,7 @@ def fix_ticket(request):
 # tiquets traités
 @api_view(['GET'])
 def fixed_tickets(request):
-    ticket = Ticket.objects.Filter(fixed=True)                     
+    ticket = Ticket.objects.filter(fixed=True)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 
