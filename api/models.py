@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
+
 from .managers import CustomUserManager
 from django.utils.translation import ugettext_lazy as _
 from safedelete.models import SafeDeleteModel
@@ -76,10 +77,16 @@ class Category(TimestampedModel):
 
 class Ticket(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
-    description = models.CharField(max_length=1024)  
+    description = models.TextField(max_length=1024)  
     fixed = models.BooleanField(default=False)
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)
+
+class Reply(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    message = models.TextField(max_length=1024)  
+    read = models.BooleanField(default=False)
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, blank=True, null=True)
     
 
 class Picture(TimestampedModel):

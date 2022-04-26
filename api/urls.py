@@ -16,6 +16,7 @@ router.register('users', views.UserProfileViewSet, basename='users')
 router.register('categories', views.CategoryViewSet, basename='categories')
 router.register('companies', views.CompanyViewSet, basename='companies')
 router.register('tickets', views.TicketViewSet, basename='tickets')
+router.register('replies', views.ReplyViewSet, basename='replies')
 path('register/', RegisterView.as_view(), name='auth_register'),   
 
 
@@ -31,6 +32,10 @@ urlpatterns = [
     path('fix_ticket/', views.fix_ticket),
     path('fixed_tickets/', views.fixed_tickets),
     path('unfixed_tickets/', views.unfixed_tickets),
+    path('read-reply/', views.read_reply),
+    path('dashboard/', views.dashboard),
+
+
 
 
 

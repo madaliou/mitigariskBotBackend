@@ -4,14 +4,10 @@ from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMultiAlternatives
 from django.template.context import RequestContext
 from django.urls.base import translate_url
-from .models import UserProfile, Company, Category, Ticket
+from .models import UserProfile, Company, Category, Ticket, Reply
 from .serializers import UserProfileSerializer, UserProfileReadSerializer, ChangePasswordSerializer
-from .serializers import CompanyReadSerializer, CategoryReadSerializer, TicketReadSerializer
-from .serializers import CompanySerializer, CategorySerializer, TicketSerializer, RegisterSerializer
-
-
-
-
+from .serializers import CompanyReadSerializer, CategoryReadSerializer, TicketReadSerializer, ReplyReadSerializer
+from .serializers import CompanySerializer, CategorySerializer, TicketSerializer, RegisterSerializer, ReplySerializer
 from django.core.mail import send_mail
 import json
 from django.contrib.auth.models import User
@@ -68,7 +64,6 @@ def jwt_response_payload_handler(token, user=None, request=None):
         'userData': UserProfileReadSerializer(user, context={'request': request}).data
     }
 
-
 class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all().order_by('-id') 
@@ -98,7 +93,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return UserProfileReadSerializer
         return UserProfileSerializer
 
-
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     def get_serializer_class(self):
@@ -106,12 +100,10 @@ class TicketViewSet(viewsets.ModelViewSet):
             return TicketReadSerializer
         return TicketSerializer
     """ serializer_class = Ticket
-
     def get_queryset(self):
         if (self.request.user.role == 'admin'):
             recipients = UserProfile.objects.filter(Q(role='recipient'))
             return recipients
-
         else:
             recipients = UserProfile.objects.filter(
                 Q(role='recipient') & Q(parent_id=self.request.user.id))
@@ -149,6 +141,46 @@ class TicketViewSet(viewsets.ModelViewSet):
             instance.author = request.user         
             instance.save()
             show = TicketReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ReplyViewSet(viewsets.ModelViewSet):
+    queryset = Reply.objects.all()
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return ReplyReadSerializer
+        return ReplySerializer
+
+    def create(self, request, *args, **kwargs):    
+        data = {
+            'ticket_id': request.data['ticket'],          
+            'message': request.data['message'],            
+        }
+        serializer = ReplyReadSerializer(data=data)
+        if serializer.is_valid():
+            instance = serializer.save() 
+            instance.ticket = Ticket.objects.get(id = request.data['ticket'] )  
+            instance.message = request.data['message']    
+            instance.save()
+            show = ReplyReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = {
+            'ticket': request.data['ticket'],          
+            'message': request.data['message'],            
+        }
+        serializer = ReplyReadSerializer(instance, data=data)
+        if serializer.is_valid():
+            instance = serializer.save()   
+            instance.ticket = Ticket.objects.get(id = request.data['ticket'] )  
+            instance.message = request.data['message']       
+            instance.save()
+            show = ReplyReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -208,7 +240,6 @@ def fix_ticket(request):
     serializer = TicketReadSerializer(ticket, many=False)    
     return Response(serializer.data)
 
-
 # tiquets traités
 @api_view(['GET'])
 def fixed_tickets(request):
@@ -216,10 +247,34 @@ def fixed_tickets(request):
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 
-
 # tiquets non traités
 @api_view(['GET'])
 def unfixed_tickets(request):
     ticket = Ticket.objects.filter(fixed=False)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
+
+# message lus
+@api_view(['POST'])
+def read_reply(request):
+    ticket = Reply.objects.get(id=request.data['id'])   
+    if ticket is not None :
+        if ticket.read == 0:        
+            ticket.read=1                
+    ticket.save()                  
+    serializer = ReplyReadSerializer(ticket, many=False)    
+    return Response(serializer.data)
+
+#Dashboard Admin
+@api_view(['GET'])
+def dashboard(request):
+    fixed_tickets = Ticket.objects.filter(fixed=True).count()
+    unfixed_tickets = Ticket.objects.all(fixed=False).count()
+    companies = Company.objects.all().count()
+
+    return Response({
+        'fixed_tickets': fixed_tickets,
+        'unfixed_tickets': unfixed_tickets,
+        'companies': companies,
+
+    })

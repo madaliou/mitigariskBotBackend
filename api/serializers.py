@@ -3,7 +3,7 @@ from os import truncate
 from django.utils import tree
 from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
-from .models import UserProfile, Picture, Company, Category, Ticket
+from .models import UserProfile, Picture, Company, Category, Ticket, Reply
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -177,14 +177,24 @@ class TicketReadSerializer(serializers.ModelSerializer):
         model = Ticket
         fields = '__all__'          
         depth = 10
-
    
 class TicketSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Ticket
         fields = ('id','description', 'category')
 
-
+class ReplyReadSerializer(serializers.ModelSerializer):  
+    author = UserProfileReadSerializer(many=False, read_only=True) 
+    ticket = TicketReadSerializer(many=False, read_only=True) 
+    class Meta:
+        model = Reply
+        fields = '__all__'          
+        depth = 10
+   
+class ReplySerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = Reply
+        fields = ('id','message', 'ticket')
 
 class ChangePasswordSerializer(serializers.Serializer):
     model = UserProfile
