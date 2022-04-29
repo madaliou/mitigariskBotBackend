@@ -72,6 +72,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             #user = super().create(validated_data)
             user.set_password('admin123')
             user.passwordChanged = 1
+            user.save()
         if validated_data['role'] == 'user':
             user = UserProfile()
             print('validated_datavalidated_datavalidated_data', validated_data['company'])
