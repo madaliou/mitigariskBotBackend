@@ -242,7 +242,7 @@ def fix_ticket(request):
 
 # tiquets traités
 @api_view(['GET'])
-def fixed_tickets(request):
+def   fixed_tickets(request):
     ticket = Ticket.objects.filter(fixed=True)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
@@ -269,7 +269,7 @@ def read_reply(request):
 @api_view(['GET'])
 def dashboard(request):
     fixed_tickets = Ticket.objects.filter(fixed=True).count()
-    unfixed_tickets = Ticket.objects.all(fixed=False).count()
+    unfixed_tickets = Ticket.objects.filter(fixed=False).count()
     companies = Company.objects.all().count()
 
     return Response({
