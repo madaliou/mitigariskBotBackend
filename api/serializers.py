@@ -107,6 +107,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             msg.content_subtype = "html"  # Main content is now text/html
             msg.send()
             user.set_password(password)
+            user.passwordChanged = 1
             user.save()
             print("Mail successfully sent")
         user.save()
