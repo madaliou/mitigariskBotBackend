@@ -48,17 +48,18 @@ class TicketReadSerializer(serializers.ModelSerializer):
         depth = 10
 
 class UserProfileReadSerializer(serializers.ModelSerializer):  
-    company = CompanyReadSerializer(many=True, read_only=True)
+    company = CompanyReadSerializer(many=False, read_only=True)
     tickets = TicketReadSerializer(many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'tickets', 'created_at', 'updated_at')   
+        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'tickets', 'created_at', 'updated_at') 
+        depth = 10  
  
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserProfile
         #extra_kwargs = {'password': {'write_only': True}}
-        fields = ('first_name', 'last_name', 'email', 'role', 'passwordChanged')
+        fields = ('first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company')
     
     def create(self, validated_data):        
         if validated_data['role']=='admin':
@@ -73,8 +74,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.passwordChanged = True
         if validated_data['role'] == 'user':
             user = UserProfile()
+            print('validated_datavalidated_datavalidated_data', validated_data['company'])
             user.first_name = validated_data['first_name']
             user.last_name = validated_data['last_name']
+            user.company = validated_data['company']
             user.username = validated_data['email']
             user.email = validated_data['email']
             user.role = validated_data['role']
@@ -91,6 +94,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             ctx = {
                 'first_name': validated_data['first_name'],
                 'last_name': validated_data['last_name'],
+                'user_name': validated_data['email'],
                 'password': password
             }
             message = get_template('email/mail_template.html').render(ctx)
