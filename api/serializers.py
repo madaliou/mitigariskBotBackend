@@ -114,15 +114,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
         return user
     
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):    
+        tmp = instance.passwordChanged
         user = super().update(instance, validated_data)
         user.username = user.email
-        user.passwordChanged = user.passwordChanged
+        user.passwordChanged = tmp
         try:
             user.save()
         except KeyError:
             pass
-        return user       
+        return user  
 
 
 class RegisterSerializer(serializers.ModelSerializer):
