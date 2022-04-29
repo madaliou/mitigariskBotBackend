@@ -71,7 +71,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.role = validated_data['role']
             #user = super().create(validated_data)
             user.set_password('admin123')
-            user.passwordChanged = True
+            user.passwordChanged = 1
         if validated_data['role'] == 'user':
             user = UserProfile()
             print('validated_datavalidated_datavalidated_data', validated_data['company'])
@@ -107,7 +107,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             msg.content_subtype = "html"  # Main content is now text/html
             msg.send()
             user.set_password(password)
-            user.passwordChanged = 1
             user.save()
             print("Mail successfully sent")
         user.save()
