@@ -116,6 +116,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         user = super().update(instance, validated_data)
+        user.username = user.email
         try:
             user.save()
         except KeyError:
