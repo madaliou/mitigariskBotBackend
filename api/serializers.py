@@ -64,6 +64,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):        
         if validated_data['role']=='admin':
             user = UserProfile()
+            user.passwordChanged = True
             user.first_name = validated_data['first_name']
             user.last_name = validated_data['last_name']
             user.username = validated_data['email']
@@ -71,11 +72,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.role = validated_data['role']
             #user = super().create(validated_data)
             user.set_password('admin123')
-            user.passwordChanged = 1
             user.save()
         if validated_data['role'] == 'user':
             user = UserProfile()
-            print('validated_datavalidated_datavalidated_data', validated_data['company'])
             user.first_name = validated_data['first_name']
             user.last_name = validated_data['last_name']
             user.company = validated_data['company']
