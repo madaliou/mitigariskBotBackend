@@ -94,20 +94,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserProfileSerializer
 
 class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    def get_serializer_class(self):
-        if self.request.method in ['GET']:
-            return TicketReadSerializer
-        return TicketSerializer
-    """ serializer_class = Ticket
+    serializer_class = TicketReadSerializer    
     def get_queryset(self):
         if (self.request.user.role == 'admin'):
-            recipients = UserProfile.objects.filter(Q(role='recipient'))
-            return recipients
+            tickets = Ticket.objects.all()
+            return tickets
         else:
-            recipients = UserProfile.objects.filter(
-                Q(role='recipient') & Q(parent_id=self.request.user.id))
-            return recipients """
+            tickets = Ticket.objects.filter(author=self.request.user.id)
+            return tickets
 
     def create(self, request, *args, **kwargs):    
         data = {
@@ -146,11 +140,14 @@ class TicketViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ReplyViewSet(viewsets.ModelViewSet):
-    queryset = Reply.objects.all()
-    def get_serializer_class(self):
-        if self.request.method in ['GET']:
-            return ReplyReadSerializer
-        return ReplySerializer
+    serializer_class = ReplyReadSerializer    
+    def get_queryset(self):
+        if (self.request.user.role == 'admin'):
+            replies = Reply.objects.all()
+            return replies
+        else:
+            replies = Reply.objects.filter(ticket__author__id=self.request.user.id)
+            return replies
 
     def create(self, request, *args, **kwargs):    
         data = {
