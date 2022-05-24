@@ -74,9 +74,17 @@ class Category(TimestampedModel):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=1024, null=True)  
 
+class Solution(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=1024, null=True) 
+    company = models.ForeignKey(Company, related_name='solutions', on_delete=models.CASCADE, null=True)
+ 
+
 
 class Ticket(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
+    reference = models.CharField(max_length=255,null=True)
     description = models.TextField(max_length=1024)  
     fixed = models.BooleanField(default=False)
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)

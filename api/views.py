@@ -4,10 +4,10 @@ from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMultiAlternatives
 from django.template.context import RequestContext
 from django.urls.base import translate_url
-from .models import UserProfile, Company, Category, Ticket, Reply
+from .models import UserProfile, Company, Category, Ticket, Reply, Solution
 from .serializers import UserProfileSerializer, UserProfileReadSerializer, ChangePasswordSerializer
-from .serializers import CompanyReadSerializer, CategoryReadSerializer, TicketReadSerializer, ReplyReadSerializer
-from .serializers import CompanySerializer, CategorySerializer, TicketSerializer, RegisterSerializer, ReplySerializer
+from .serializers import CompanyReadSerializer, CategoryReadSerializer, TicketReadSerializer, ReplyReadSerializer, SolutionReadSerializer
+from .serializers import CompanySerializer, CategorySerializer, TicketSerializer, RegisterSerializer, ReplySerializer, SolutionSerializer
 from django.core.mail import send_mail
 import json
 from django.contrib.auth.models import User
@@ -93,6 +93,50 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return UserProfileReadSerializer
         return UserProfileSerializer
 
+class SolutionViewSet(viewsets.ModelViewSet):
+    serializer_class = SolutionReadSerializer    
+    def get_queryset(self):
+        if (self.request.user.role == 'admin'):
+            solutions = Solution.objects.all()
+            return solutions
+        else:
+            solutions = Solution.objects.filter(company=self.request.user.company.id)
+            return solutions
+
+    def create(self, request, *args, **kwargs):    
+        data = {
+            'name': request.data['name'],          
+            'description': request.data['description'],  
+            'company': request.data['company']            
+        }
+        serializer = SolutionReadSerializer(data=data)
+        if serializer.is_valid():
+            instance = serializer.save() 
+            instance.company = Company.objects.get(id = request.data['company'] )              
+            instance.save()
+            show = SolutionReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = {
+            'name': request.data['name'],          
+            'description': request.data['description'],  
+            'company': request.data['company'],   
+        }
+        serializer = SolutionReadSerializer(instance, data=data)
+        if serializer.is_valid():
+            instance = serializer.save()   
+            instance.company = Company.objects.get(id = request.data['company'] )  
+            instance.save()
+            show = SolutionReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketReadSerializer    
     def get_queryset(self):
@@ -106,7 +150,9 @@ class TicketViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):    
         data = {
             'category': request.data['category'],          
-            'description': request.data['description'],            
+            'description': request.data['description'],  
+            'solution': request.data['solution'],            
+            'reference': uuid.uuid4().hex[:10],
             'author': request.user.id
 
         }
@@ -114,24 +160,28 @@ class TicketViewSet(viewsets.ModelViewSet):
         serializer = TicketReadSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save() 
-            instance.category = Category.objects.get(id = request.data['category'] )       
+            instance.category = Category.objects.get(id = request.data['category'] )  
+            instance.solution = Solution.objects.get(id = request.data['solution'] )      
             instance.author = request.user   
             instance.save()
             show = TicketReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         data = {
             'category': request.data['category'],
-            'description': request.data['description'],            
+            'description': request.data['description'],  
+            'solution': request.data['solution'],                   
             'author': request.user.id
         }
         serializer = TicketReadSerializer(instance, data=data)
         if serializer.is_valid():
             instance = serializer.save()   
-            instance.category = Category.objects.get(id = request.data['category'] )       
+            instance.category = Category.objects.get(id = request.data['category'] )  
+            instance.solution = Solution.objects.get(id = request.data['solution'] )         
             instance.author = request.user         
             instance.save()
             show = TicketReadSerializer(instance)
