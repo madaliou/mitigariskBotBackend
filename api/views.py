@@ -210,6 +210,21 @@ class ReplyViewSet(viewsets.ModelViewSet):
             instance.ticket = Ticket.objects.get(id = request.data['ticket'] )  
             instance.message = request.data['message']    
             instance.save()
+            tic = Ticket.objects.get(id = request.data['ticket'] )
+            email = tic.author.email
+            print(email)
+            objet = 'AppSupport'
+            message = get_template('email/reply_mail_template.html').render(data)
+            msg = EmailMessage(
+                objet,
+                message,
+                'test.transvie@gmail.com',
+                [email],
+            )
+            msg.content_subtype = "html"  # Main content is now text/html
+            msg.send()
+            print("Mail successfully sent")
+
             show = ReplyReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)
         else:
