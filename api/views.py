@@ -340,17 +340,17 @@ def fixed_tickets(request):
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 
-# tiquets non traités
+# tiquets en cours de traitement
 @api_view(['GET'])
-def unfixed_tickets(request):
-    ticket = Ticket.objects.filter(fixed=0)                     
+def infinxing_tickets(request):
+    ticket = Ticket.objects.filter(fixed=1)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 
 # tiquets en cours de traitement
 @api_view(['GET'])
-def infinxing_tickets(request):
-    ticket = Ticket.objects.filter(fixed=1)                     
+def unfixed_tickets(request):
+    ticket = Ticket.objects.filter(fixed=0)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 
