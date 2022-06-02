@@ -29,9 +29,13 @@ urlpatterns = [
     path('login/', obtain_jwt_token),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('fix_ticket/', views.fix_ticket),
+    path('unfix-ticket/', views.unfix_ticket),
     path('fixed_tickets/', views.fixed_tickets),
     path('unfixed_tickets/', views.unfixed_tickets),
+    path('infinxing-tickets/', views.infinxing_tickets),
     path('read-reply/', views.read_reply),
+    path('begin-fixing-ticket/', views.begin_fixing_ticket),
+    path('begin-unfixing-ticket/', views.begin_unfixing_ticket),
     path('dashboard/', views.dashboard),
 
 

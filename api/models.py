@@ -26,6 +26,10 @@ GENDERCHOICES = (
     ('female', 'Feminin'),
 )
 
+""" INCIDENTCHOICES = (
+    ('critic', 'Masculin'),
+    ('female', 'Feminin'),
+) """
 # Create your models here.
 class TimestampedModel(SafeDeleteModel):
     _safedelete_policy = HARD_DELETE_NOCASCADE
@@ -40,14 +44,16 @@ class TimestampedModel(SafeDeleteModel):
 class Company(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=255) 
-    description = models.CharField(max_length=1024)  
+    description = models.CharField(max_length=1024) 
+    email = models.EmailField(max_length=70,blank=True, unique=True)
+    phoneNumber = models.CharField(max_length=20, null=True, unique=True)
+    resourcePerson = models.CharField(max_length=255, blank=True)
 
 
-
+ 
 class UserProfile(AbstractUser):
     email = models.EmailField(max_length=70,blank=True, unique=True)
     role = models.CharField(_("Role"), max_length=255, choices=ROLECHOICES, blank=True) 
-    first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     passwordChanged = models.BooleanField(default=False)   
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children', null=True, on_delete=models.CASCADE)
@@ -86,10 +92,11 @@ class Ticket(TimestampedModel):
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     reference = models.CharField(max_length=255,null=True)
     description = models.TextField(max_length=1024)  
-    fixed = models.BooleanField(default=False)
+    fixed = models.PositiveSmallIntegerField(default=0)
+    #typeOfIncident = models.CharField(_("Incident"), max_length=255, choices=ROLECHOICES, blank=True) 
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)
-
+    
 class Reply(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     message = models.TextField(max_length=1024)  

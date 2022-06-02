@@ -291,28 +291,66 @@ def get_user(request):
 
 # Traiter un tiquet
 @api_view(['POST'])
+def begin_fixing_ticket(request):
+    ticket = Ticket.objects.get(id=request.data['ticket'])   
+    if ticket is not None :
+        if ticket.fixed == 0:     
+            ticket.fixed=1
+            ticket.save()        
+    serializer = TicketReadSerializer(ticket, many=False)    
+    return Response(serializer.data)        
+
+# Traiter un tiquet
+@api_view(['POST'])
+def begin_unfixing_ticket(request):
+    ticket = Ticket.objects.get(id=request.data['ticket'])   
+    if ticket is not None :
+        if ticket.fixed == 1:
+            ticket.fixed=0     
+            ticket.save()            
+    serializer = TicketReadSerializer(ticket, many=False)    
+    return Response(serializer.data)
+
+# tiquet en cours
+@api_view(['POST'])
 def fix_ticket(request):
     ticket = Ticket.objects.get(id=request.data['ticket'])   
     if ticket is not None :
-        if ticket.fixed == 0:        
-            ticket.fixed=1
-        else:
-            ticket.fixed=0           
+        if ticket.fixed == 1:        
+            ticket.fixed=2        
+    ticket.save()                  
+    serializer = TicketReadSerializer(ticket, many=False)    
+    return Response(serializer.data)
+
+# tiquet en cours
+@api_view(['POST'])
+def unfix_ticket(request):
+    ticket = Ticket.objects.get(id=request.data['ticket'])   
+    if ticket is not None :
+        if ticket.fixed == 2:
+            ticket.fixed=1          
     ticket.save()                  
     serializer = TicketReadSerializer(ticket, many=False)    
     return Response(serializer.data)
 
 # tiquets traités
 @api_view(['GET'])
-def   fixed_tickets(request):
-    ticket = Ticket.objects.filter(fixed=True)                     
+def fixed_tickets(request):
+    ticket = Ticket.objects.filter(fixed=2)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 
 # tiquets non traités
 @api_view(['GET'])
 def unfixed_tickets(request):
-    ticket = Ticket.objects.filter(fixed=False)                     
+    ticket = Ticket.objects.filter(fixed=0)                     
+    serializer = TicketReadSerializer(ticket, many=True)    
+    return Response(serializer.data)
+
+# tiquets en cours de traitement
+@api_view(['GET'])
+def infinxing_tickets(request):
+    ticket = Ticket.objects.filter(fixed=1)                     
     serializer = TicketReadSerializer(ticket, many=True)    
     return Response(serializer.data)
 

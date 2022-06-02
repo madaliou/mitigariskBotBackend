@@ -34,7 +34,7 @@ class CompanyReadSerializer(serializers.ModelSerializer):
     #users = UserProfileReadSerializer(many=True, read_only=True) 
     class Meta:
         model = Company
-        fields = ('id', 'name', 'description', 'created_at', 'updated_at')   
+        fields = ('id', 'name', 'description', 'email', 'phoneNumber', 'resourcePerson', 'created_at', 'updated_at')   
    
 class CompanySerializer(serializers.ModelSerializer):
     class Meta(object):
