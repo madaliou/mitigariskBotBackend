@@ -95,6 +95,7 @@ class Ticket(TimestampedModel):
     fixed = models.PositiveSmallIntegerField(default=0)
     #typeOfIncident = models.CharField(_("Incident"), max_length=255, choices=ROLECHOICES, blank=True) 
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
+    solution = models.ForeignKey(Solution, related_name='tickets', on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)
     
 class Reply(TimestampedModel):   
