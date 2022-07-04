@@ -26,10 +26,12 @@ GENDERCHOICES = (
     ('female', 'Feminin'),
 )
 
-""" INCIDENTCHOICES = (
-    ('critic', 'Masculin'),
-    ('female', 'Feminin'),
-) """
+PLATFORMCHOICES = (
+    ('whatsapp', 'Whatsapp'),
+    ('facebook', 'Facebook'),
+    ('telegram', 'Telegram'),
+
+)
 # Create your models here.
 class TimestampedModel(SafeDeleteModel):
     _safedelete_policy = HARD_DELETE_NOCASCADE
@@ -53,6 +55,7 @@ class Company(TimestampedModel):
  
 class UserProfile(AbstractUser):
     email = models.EmailField(max_length=70,blank=True, unique=True)
+    phoneNumber = models.CharField(max_length=20, unique=True)
     role = models.CharField(_("Role"), max_length=255, choices=ROLECHOICES, blank=True) 
     last_name = models.CharField(max_length=255, blank=True)
     passwordChanged = models.BooleanField(default=False)   
@@ -93,7 +96,8 @@ class Ticket(TimestampedModel):
     reference = models.CharField(max_length=255,null=True)
     description = models.TextField(max_length=1024)  
     fixed = models.PositiveSmallIntegerField(default=0)
-    #typeOfIncident = models.CharField(_("Incident"), max_length=255, choices=ROLECHOICES, blank=True) 
+    urgency = models.BooleanField(default=1)
+    platform = models.CharField(_("PLATFORM"), max_length=255, choices=PLATFORMCHOICES, blank=True, null=True) 
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
     solution = models.ForeignKey(Solution, related_name='tickets', on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)

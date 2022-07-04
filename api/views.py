@@ -189,6 +189,47 @@ class TicketViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class BotTicketViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    serializer_class = TicketReadSerializer    
+    def get_queryset(self):
+        if (self.request.user.role == 'admin'):
+            tickets = Ticket.objects.all()
+            return tickets
+        else:
+            tickets = Ticket.objects.filter(author=self.request.user.id)
+            return tickets
+
+    def create(self, request, *args, **kwargs):   
+        user =  UserProfile.objects.filter(phoneNumber=request.data['phoneNumber'] ).first()
+        if user is None:
+            return Response({"message": ["Vous n\'etes pas autorisé à effectuer cette action"]}, status=status.HTTP_400_BAD_REQUEST) 
+        userr =  UserProfile.objects.get(phoneNumber=request.data['phoneNumber'])
+
+        print('userrrrrrrrrrrrrrrrrrrrrrrrrrrr', userr)
+        
+        data = {
+            'category': request.data['category'],          
+            'description': request.data['description'],  
+            'solution': request.data['solution'],            
+            'reference': uuid.uuid4().hex[:10],
+            'author': userr
+
+        }     
+        serializer = TicketReadSerializer(data=data)
+        if serializer.is_valid():
+            instance = serializer.save() 
+            instance.category = Category.objects.get(id = request.data['category'] )  
+            instance.solution = Solution.objects.get(id = request.data['solution'] )  
+            instance.phoneNumber = request.data['phoneNumber']    
+            instance.platform = request.data['platform']    
+            instance.author = userr   
+            instance.save()
+            show = TicketReadSerializer(instance)
+            return Response(show.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)         
+
 class ReplyViewSet(viewsets.ModelViewSet):
     serializer_class = ReplyReadSerializer    
     def get_queryset(self):
@@ -198,7 +239,7 @@ class ReplyViewSet(viewsets.ModelViewSet):
         else:
             replies = Reply.objects.filter(ticket__author__id=self.request.user.id)
             return replies
-
+    
     def create(self, request, *args, **kwargs):    
         data = {
             'ticket_id': request.data['ticket'],          

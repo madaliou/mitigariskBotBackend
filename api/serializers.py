@@ -52,14 +52,14 @@ class UserProfileReadSerializer(serializers.ModelSerializer):
     tickets = TicketReadSerializer(many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'tickets', 'created_at', 'updated_at') 
+        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'tickets', 'phoneNumber', 'created_at', 'updated_at') 
         depth = 10  
  
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserProfile
         #extra_kwargs = {'password': {'write_only': True}}
-        fields = ('first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company')
+        fields = ('first_name', 'last_name', 'email', 'phoneNumber', 'role', 'passwordChanged', 'company')
     
     def create(self, validated_data):        
         if validated_data['role']=='admin':
@@ -70,6 +70,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.username = validated_data['email']
             user.email = validated_data['email']
             user.role = validated_data['role']
+            user.phoneNumber = validated_data['phoneNumber']
+
             #user = super().create(validated_data)
             user.set_password('admin123')
             user.save()
@@ -81,6 +83,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.username = validated_data['email']
             user.email = validated_data['email']
             user.role = validated_data['role']
+            user.phoneNumber = validated_data['phoneNumber']
+
             #user = super().create(validated_data)
             password = UserProfile.objects.make_random_password(length=8,
                                                                 allowed_chars='abcdefghijklmnopqrstuvwxyz'
