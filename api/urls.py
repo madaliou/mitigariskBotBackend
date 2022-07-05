@@ -19,6 +19,8 @@ router.register('tickets', views.TicketViewSet, basename='tickets')
 router.register('botTickets', views.BotTicketViewSet, basename='botTickets')
 router.register('replies', views.ReplyViewSet, basename='replies')
 router.register('solutions', views.SolutionViewSet, basename='solutions')
+router.register('botSolutions', views.BotSolutionViewSet, basename='botSolutions')
+
 path('register/', RegisterView.as_view(), name='auth_register'),  
 #router.register('domains', views.DomainViewSet, basename='domains')
 

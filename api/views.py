@@ -95,7 +95,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserProfileSerializer
 
 class SolutionViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
     serializer_class = SolutionReadSerializer    
     def get_queryset(self):
         if (self.request.user.role == 'admin'):
@@ -138,7 +137,19 @@ class SolutionViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class BotSolutionViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = Solution.objects.all().order_by('-id') 
 
+    def get_serializer_class(self):
+        
+        if self.request.method in ['GET']:
+            
+            return SolutionReadSerializer
+        return SolutionSerializer   
+    
+
+   
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketReadSerializer    
     def get_queryset(self):
