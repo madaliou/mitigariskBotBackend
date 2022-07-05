@@ -65,6 +65,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
     }
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
 
     queryset = Category.objects.all().order_by('-id') 
 
@@ -94,6 +95,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return UserProfileSerializer
 
 class SolutionViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
     serializer_class = SolutionReadSerializer    
     def get_queryset(self):
         if (self.request.user.role == 'admin'):
