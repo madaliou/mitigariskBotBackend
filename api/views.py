@@ -1,5 +1,6 @@
 from datetime import date
 from os import name, removexattr
+from unicodedata import category
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMultiAlternatives
 from django.template.context import RequestContext
@@ -228,7 +229,17 @@ class BotTicketViewSet(viewsets.ModelViewSet):
             'reference': uuid.uuid4().hex[:10],
             'author': userr
 
-        }     
+        }    
+        category =  Category.objects.filter(id=request.data['category'] ).first()
+ 
+        if category is None:
+            return Response({"message": ["Cette catégorie n'existe pas"]}, status=status.HTTP_400_BAD_REQUEST) 
+        
+        solution =  Solution.objects.filter(id=request.data['solution'] ).first()
+ 
+        if solution is None:
+            return Response({"message": ["Cette Solution n'existe pas"]}, status=status.HTTP_400_BAD_REQUEST) 
+
         serializer = TicketReadSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save() 
