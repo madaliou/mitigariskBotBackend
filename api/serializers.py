@@ -61,7 +61,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         #extra_kwargs = {'password': {'write_only': True}}
         fields = ('first_name', 'last_name', 'email', 'phoneNumber', 'role', 'passwordChanged', 'company')
     
-    def create(self, validated_data):        
+    def create(self, validated_data):    
+
         if validated_data['role']=='admin':
             user = UserProfile()
             user.passwordChanged = True
@@ -70,11 +71,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.username = validated_data['email']
             user.email = validated_data['email']
             user.role = validated_data['role']
-            user.phoneNumber = validated_data['phoneNumber']
-
+            user.phoneNumber = (validated_data['phoneNumber']).replace(" ", "")
             #user = super().create(validated_data)
             user.set_password('admin123')
             user.save()
+            print('.strip().strip().strip().strip()', user.phoneNumber)
         if validated_data['role'] == 'user':
             user = UserProfile()
             user.first_name = validated_data['first_name']
@@ -83,7 +84,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user.username = validated_data['email']
             user.email = validated_data['email']
             user.role = validated_data['role']
-            user.phoneNumber = validated_data['phoneNumber']
+            user.phoneNumber = (validated_data['phoneNumber']).replace(" ", "")
 
             #user = super().create(validated_data)
             password = UserProfile.objects.make_random_password(length=8,
