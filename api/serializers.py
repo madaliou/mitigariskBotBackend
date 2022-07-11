@@ -123,6 +123,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         tmp = instance.passwordChanged
         user = super().update(instance, validated_data)
         user.username = user.email
+        user.phoneNumber = (validated_data['phoneNumber']).replace(" ", "")
         user.passwordChanged = tmp
         try:
             user.save()
