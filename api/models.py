@@ -96,7 +96,7 @@ class Ticket(TimestampedModel):
     reference = models.CharField(max_length=255,null=True)
     description = models.TextField(max_length=1024)  
     fixed = models.PositiveSmallIntegerField(default=0)
-    urgency = models.BooleanField(default=1)
+    urgency = models.BooleanField(default=0)
     platform = models.CharField(_("PLATFORM"), max_length=255, choices=PLATFORMCHOICES, blank=True, null=True) 
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
     solution = models.ForeignKey(Solution, related_name='tickets', on_delete=models.CASCADE, null=True)

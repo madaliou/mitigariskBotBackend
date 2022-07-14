@@ -34,6 +34,8 @@ urlpatterns = [
     path('fix_ticket/', views.fix_ticket),
     path('unfix-ticket/', views.unfix_ticket),
     path('fixed_tickets/', views.fixed_tickets),
+    path('urgent-tickets/', views.urgent_tickets),
+    path('not-urgent-tickets/', views.not_urgent_tickets),
     path('unfixed_tickets/', views.unfixed_tickets),
     path('infinxing-tickets/', views.infinxing_tickets),
     path('begin-fixing-ticket/', views.begin_fixing_ticket),

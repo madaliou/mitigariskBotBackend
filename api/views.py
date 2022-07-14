@@ -246,7 +246,8 @@ class BotTicketViewSet(viewsets.ModelViewSet):
             instance.category = Category.objects.get(id = request.data['category'] )  
             instance.solution = Solution.objects.get(id = request.data['solution'] )  
             instance.phoneNumber = request.data['phoneNumber']    
-            instance.platform = request.data['platform']    
+            instance.platform = request.data['platform']  
+            instance.urgency = 1   
             instance.author = userr   
             instance.save()
             show = TicketReadSerializer(instance)
@@ -428,6 +429,20 @@ def read_reply(request):
             ticket.read=1                
     ticket.save()                  
     serializer = ReplyReadSerializer(ticket, many=False)    
+    return Response(serializer.data)
+
+# tiquets urgents
+@api_view(['GET'])
+def urgent_tickets(request):
+    tickets = Ticket.objects.filter(urgency=1)                     
+    serializer = TicketReadSerializer(tickets, many=True)    
+    return Response(serializer.data)
+
+# tiquets non urgents
+@api_view(['GET'])
+def not_urgent_tickets(request):
+    tickets = Ticket.objects.filter(urgency=0)                     
+    serializer = TicketReadSerializer(tickets, many=True)    
     return Response(serializer.data)
 
 #Dashboard Admin
