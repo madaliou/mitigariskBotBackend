@@ -50,6 +50,7 @@ class Company(TimestampedModel):
     email = models.EmailField(max_length=70,blank=True, unique=True)
     phoneNumber = models.CharField(max_length=20, null=True, unique=True)
     resourcePerson = models.CharField(max_length=255, blank=True)
+    
 
 
  

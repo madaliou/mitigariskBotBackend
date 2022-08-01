@@ -42,6 +42,7 @@ urlpatterns = [
     path('begin-unfixing-ticket/', views.begin_unfixing_ticket),
     path('read-reply/', views.read_reply),
     path('dashboard/', views.dashboard),
+    path('user-solutions/', views.user_solutions),
 
 
 

@@ -458,3 +458,17 @@ def dashboard(request):
         'companies': companies,
 
     })
+
+
+# User's company solutions
+@api_view(['POST'])
+def user_solutions(request):
+    user = UserProfile.objects.filter(phoneNumber=request.data['phoneNumber'])  
+    if len(user) > 0:  
+        solutions = Solution.objects.distinct().filter(company__users__phoneNumber=request.data['phoneNumber'])
+    else :
+        return Response({"message": ["Utilisateur inconu !"]}, status=status.HTTP_400_BAD_REQUEST)
+    
+    sol = SolutionReadSerializer(solutions, many=True).data        
+    return Response( {'userSolutions': sol,  
+                        })
