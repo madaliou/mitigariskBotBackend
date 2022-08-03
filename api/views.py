@@ -462,6 +462,7 @@ def dashboard(request):
 
 # User's company solutions
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def user_solutions(request):
     user = UserProfile.objects.filter(phoneNumber=request.data['phoneNumber'])  
     if len(user) > 0:  
