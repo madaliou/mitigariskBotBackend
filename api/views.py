@@ -470,6 +470,5 @@ def user_solutions(request):
     else :
         return Response({"message": ["Utilisateur inconu !"]}, status=status.HTTP_400_BAD_REQUEST)
     
-    sol = SolutionReadSerializer(solutions, many=True).data        
-    return Response( {'userSolutions': sol,  
-                        })
+    serializer = TicketReadSerializer(solutions, many=True)    
+    return Response(serializer.data)
