@@ -470,5 +470,5 @@ def user_solutions(request):
     else :
         return Response({"message": ["Utilisateur inconu !"]}, status=status.HTTP_400_BAD_REQUEST)
     
-    serializer = TicketReadSerializer(solutions, many=True)    
+    serializer = SolutionReadSerializer(solutions, many=True)    
     return Response(serializer.data)
