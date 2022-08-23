@@ -448,13 +448,17 @@ def not_urgent_tickets(request):
 #Dashboard Admin
 @api_view(['GET'])
 def dashboard(request):
-    fixed_tickets = Ticket.objects.filter(fixed=True).count()
-    unfixed_tickets = Ticket.objects.filter(fixed=False).count()
+    total_tickets = Ticket.objects.filter().count()
+    fixed_tickets = Ticket.objects.filter(fixed=2).count()
+    unfixed_tickets = Ticket.objects.filter(fixed=0).count()
+    infixing_tickets = Ticket.objects.filter(fixed=1).count()
     companies = Company.objects.all().count()
 
     return Response({
         'fixed_tickets': fixed_tickets,
         'unfixed_tickets': unfixed_tickets,
+        'infixing_tickets': infixing_tickets,
+        'total_tickets': total_tickets,
         'companies': companies,
 
     })
