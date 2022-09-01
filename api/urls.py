@@ -43,6 +43,7 @@ urlpatterns = [
     path('read-reply/', views.read_reply),
     path('dashboard/', views.dashboard),
     path('user-solutions/', views.user_solutions),
+    path('track-ticket/', views.track_ticket),
 
 
 

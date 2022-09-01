@@ -1,5 +1,6 @@
 from datetime import date
 from os import name, removexattr
+from re import T
 from unicodedata import category
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMultiAlternatives
@@ -476,3 +477,16 @@ def user_solutions(request):
     
     serializer = SolutionReadSerializer(solutions, many=True)    
     return Response(serializer.data)
+
+# Suivi ticket
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def track_ticket(request):
+    ticket = Ticket.objects.get(reference=request.data['reference']) 
+    print(ticket) 
+    fixed = ticket.fixed
+    
+    return Response({
+        'fixed': fixed        
+
+    })
