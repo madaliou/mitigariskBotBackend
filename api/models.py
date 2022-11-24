@@ -43,16 +43,6 @@ class TimestampedModel(SafeDeleteModel):
         ordering = ['-id']
 
 
-class Company(TimestampedModel):   
-    _safedelete_policy = HARD_DELETE_NOCASCADE 
-    name = models.CharField(max_length=255) 
-    description = models.CharField(max_length=1024) 
-    email = models.EmailField(max_length=70,blank=True, unique=True)
-    phoneNumber = models.CharField(max_length=20, null=True, unique=True)
-    resourcePerson = models.CharField(max_length=255, blank=True)
-    
-
-
  
 class UserProfile(AbstractUser):
     email = models.EmailField(max_length=70,blank=True, unique=True)
@@ -61,7 +51,6 @@ class UserProfile(AbstractUser):
     last_name = models.CharField(max_length=255, blank=True)
     passwordChanged = models.BooleanField(default=False)   
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children', null=True, on_delete=models.CASCADE)
-    company = models.ForeignKey(Company, related_name='users', on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)   
    
@@ -77,30 +66,36 @@ class UserProfile(AbstractUser):
     @property
     def label(self):
         return self.name 
- 
 
+class Type(TimestampedModel):   
+    _safedelete_policy = HARD_DELETE_NOCASCADE 
+    name = models.CharField(max_length=255) 
+    description = models.CharField(max_length=1024) 
+ 
 class Category(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=1024, null=True)  
 
-class Solution(TimestampedModel):   
+class Gravity(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=1024, null=True) 
-    company = models.ForeignKey(Company, related_name='solutions', on_delete=models.CASCADE, null=True)
  
-
-
 class Ticket(TimestampedModel):   
     _safedelete_policy = HARD_DELETE_NOCASCADE 
     reference = models.CharField(max_length=255,null=True)
     description = models.TextField(max_length=1024)  
     fixed = models.PositiveSmallIntegerField(default=0)
     urgency = models.BooleanField(default=0)
+    lostOfHumanlifes = models.BooleanField(default=0, null=True)
+    injuries = models.BooleanField(default=0)
+    proceedings = models.TextField(max_length=1024, null=True) 
+    correction = models.TextField(max_length=1024, null=True) 
     platform = models.CharField(_("PLATFORM"), max_length=255, choices=PLATFORMCHOICES, blank=True, null=True) 
     category = models.ForeignKey(Category, related_name='tickets', on_delete=models.CASCADE, null=True)
-    solution = models.ForeignKey(Solution, related_name='tickets', on_delete=models.CASCADE, null=True)
+    gravity = models.ForeignKey(Gravity, related_name='tickets', on_delete=models.CASCADE, null=True)
+    type = models.ForeignKey(Type, related_name='types', on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', null=True, on_delete=models.CASCADE)
     
 class Reply(TimestampedModel):   

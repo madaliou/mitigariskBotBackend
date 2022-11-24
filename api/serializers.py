@@ -3,7 +3,7 @@ from os import truncate
 from django.utils import tree
 from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
-from .models import UserProfile, Picture, Company, Category, Ticket, Reply, Solution
+from .models import UserProfile, Picture, Type, Category, Ticket, Reply, Gravity
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -30,15 +30,15 @@ class CustomTokenSerializer(serializers.Serializer):
     token = serializers.CharField()
 
 
-class CompanyReadSerializer(serializers.ModelSerializer):  
+class TypeReadSerializer(serializers.ModelSerializer):  
     #users = UserProfileReadSerializer(many=True, read_only=True) 
     class Meta:
-        model = Company
-        fields = ('id', 'name', 'description', 'email', 'phoneNumber', 'resourcePerson', 'created_at', 'updated_at')   
+        model = Type
+        fields = ('id', 'name', 'description', 'created_at', 'updated_at')   
    
-class CompanySerializer(serializers.ModelSerializer):
+class TypeSerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = Company
+        model = Type
         fields = '__all__'
 
 class TicketReadSerializer(serializers.ModelSerializer):  
@@ -48,18 +48,18 @@ class TicketReadSerializer(serializers.ModelSerializer):
         depth = 10
 
 class UserProfileReadSerializer(serializers.ModelSerializer):  
-    company = CompanyReadSerializer(many=False, read_only=True)
+    #type = TypeReadSerializer(many=False, read_only=True)
     tickets = TicketReadSerializer(many=True, read_only=True)
     class Meta:
         model = UserProfile
-        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'company', 'author', 'tickets', 'phoneNumber', 'created_at', 'updated_at') 
+        fields = ('id',  'first_name', 'last_name', 'email', 'role', 'passwordChanged', 'author', 'tickets', 'phoneNumber', 'created_at', 'updated_at') 
         depth = 10  
  
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserProfile
         #extra_kwargs = {'password': {'write_only': True}}
-        fields = ('first_name', 'last_name', 'email', 'phoneNumber', 'role', 'passwordChanged', 'company')
+        fields = ('first_name', 'last_name', 'email', 'phoneNumber', 'role', 'passwordChanged')
     
     def create(self, validated_data):    
 
@@ -80,7 +80,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             user = UserProfile()
             user.first_name = validated_data['first_name']
             user.last_name = validated_data['last_name']
-            user.company = validated_data['company']
+            #user.type = validated_data['type']
             user.username = validated_data['email']
             user.email = validated_data['email']
             user.role = validated_data['role']
@@ -184,21 +184,21 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = '__all__'    
 
-class SolutionReadSerializer(serializers.ModelSerializer):   
+class GravityReadSerializer(serializers.ModelSerializer):   
     class Meta:
-        model = Solution
+        model = Gravity
         fields = '__all__'          
         depth = 10
   
    
-class SolutionSerializer(serializers.ModelSerializer):
+class GravitySerializer(serializers.ModelSerializer):
     class Meta(object):
-        model = Solution
+        model = Gravity
         fields = '__all__'          
 
 class TicketReadSerializer(serializers.ModelSerializer):  
     author = UserProfileReadSerializer(many=False, read_only=True) 
-    solution = SolutionReadSerializer(many=False, read_only=True) 
+    gravity = GravityReadSerializer(many=False, read_only=True) 
 
     class Meta:
         model = Ticket
@@ -208,7 +208,7 @@ class TicketReadSerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Ticket
-        fields = ('id','description', 'category', 'solution')
+        fields = ('id','description', 'category', 'gravity')
 
 class ReplyReadSerializer(serializers.ModelSerializer):  
     author = UserProfileReadSerializer(many=False, read_only=True) 

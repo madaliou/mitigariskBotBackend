@@ -1,15 +1,15 @@
 from datetime import date
-from os import name, removexattr
+#from os import name, removexattr
 from re import T
 from unicodedata import category
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMultiAlternatives
 from django.template.context import RequestContext
 from django.urls.base import translate_url
-from .models import UserProfile, Company, Category, Ticket, Reply, Solution
+from .models import UserProfile, Type, Category, Ticket, Reply, Gravity
 from .serializers import UserProfileSerializer, UserProfileReadSerializer, ChangePasswordSerializer
-from .serializers import CompanyReadSerializer, CategoryReadSerializer, TicketReadSerializer, ReplyReadSerializer, SolutionReadSerializer
-from .serializers import CompanySerializer, CategorySerializer, TicketSerializer, RegisterSerializer, ReplySerializer, SolutionSerializer
+from .serializers import TypeReadSerializer, CategoryReadSerializer, TicketReadSerializer, ReplyReadSerializer, GravityReadSerializer
+from .serializers import TypeSerializer, CategorySerializer, TicketSerializer, RegisterSerializer, ReplySerializer, GravitySerializer
 from django.core.mail import send_mail
 import json
 from django.contrib.auth.models import User
@@ -42,7 +42,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
 import uuid
-import xlrd
+#import xlrd
 from rest_framework import pagination
 from django.template import Context
 from django.template.loader import render_to_string, get_template
@@ -69,7 +69,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
 class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
 
-    queryset = Category.objects.all().order_by('-id') 
+    queryset = Category.objects.all().order_by('id') 
 
     def get_serializer_class(self):
         
@@ -78,16 +78,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return CategoryReadSerializer
         return CategorySerializer
 
-class CompanyViewSet(viewsets.ModelViewSet):
+class TypeViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    queryset = Company.objects.all().order_by('-id') 
+    queryset = Type.objects.all().order_by('id') 
 
     def get_serializer_class(self):
         
         if self.request.method in ['GET']:
             
-            return CompanyReadSerializer
-        return CompanySerializer
+            return TypeReadSerializer
+        return TypeSerializer
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
@@ -96,28 +96,28 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             return UserProfileReadSerializer
         return UserProfileSerializer
 
-class SolutionViewSet(viewsets.ModelViewSet):
-    serializer_class = SolutionReadSerializer    
+class GravityViewSet(viewsets.ModelViewSet):
+    serializer_class = GravityReadSerializer    
     def get_queryset(self):
-        if (self.request.user.role == 'admin'):
-            solutions = Solution.objects.all()
-            return solutions
-        else:
-            solutions = Solution.objects.filter(company=self.request.user.company.id)
-            return solutions
+        #if (self.request.user.role == 'admin'):
+            gravities = Gravity.objects.all()
+            return gravities
+        #else:
+            #gravities = Gravity.objects.filter(type=self.request.user.id)
+            #return gravities
 
     def create(self, request, *args, **kwargs):    
         data = {
             'name': request.data['name'],          
             'description': request.data['description'],  
-            'company': request.data['company']            
+            #'type': request.data['type']            
         }
-        serializer = SolutionReadSerializer(data=data)
+        serializer = GravityReadSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save() 
-            instance.company = Company.objects.get(id = request.data['company'] )              
+            #instance.type = Type.objects.get(id = request.data['type'] )              
             instance.save()
-            show = SolutionReadSerializer(instance)
+            show = GravityReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -127,31 +127,30 @@ class SolutionViewSet(viewsets.ModelViewSet):
         data = {
             'name': request.data['name'],          
             'description': request.data['description'],  
-            'company': request.data['company'],   
+            #'type': request.data['type'],   
         }
-        serializer = SolutionReadSerializer(instance, data=data)
+        serializer = GravityReadSerializer(instance, data=data)
         if serializer.is_valid():
             instance = serializer.save()   
-            instance.company = Company.objects.get(id = request.data['company'] )  
+            #instance.type = Type.objects.get(id = request.data['type'] )  
             instance.save()
-            show = SolutionReadSerializer(instance)
+            show = GravityReadSerializer(instance)
             return Response(show.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BotSolutionViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
-    queryset = Solution.objects.all().order_by('-id') 
+    queryset = Gravity.objects.all().order_by('-id') 
 
     def get_serializer_class(self):
         
         if self.request.method in ['GET']:
             
-            return SolutionReadSerializer
-        return SolutionSerializer   
+            return GravityReadSerializer
+        return GravitySerializer   
     
 
-   
 class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = TicketReadSerializer    
     def get_queryset(self):
@@ -165,8 +164,13 @@ class TicketViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):    
         data = {
             'category': request.data['category'],          
-            'description': request.data['description'],  
-            'solution': request.data['solution'],            
+            'description': request.data['description'], 
+            'correction': request.data['correction'], 
+            'proceedings': request.data['proceedings'], 
+            'lostOfHumanlifes': request.data['lostOfHumanlifes'],  
+            'injuries': request.data['injuries'], 
+            'gravity': request.data['gravity'],   
+            'type': request.data['type'],           
             'reference': uuid.uuid4().hex[:10],
             'author': request.user.id
 
@@ -176,7 +180,8 @@ class TicketViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             instance = serializer.save() 
             instance.category = Category.objects.get(id = request.data['category'] )  
-            instance.solution = Solution.objects.get(id = request.data['solution'] )      
+            instance.gravity = Gravity.objects.get(id = request.data['gravity'] )      
+            instance.type = Type.objects.get(id = request.data['type'] )  
             instance.author = request.user   
             instance.save()
             show = TicketReadSerializer(instance)
@@ -189,14 +194,16 @@ class TicketViewSet(viewsets.ModelViewSet):
         data = {
             'category': request.data['category'],
             'description': request.data['description'],  
-            'solution': request.data['solution'],                   
+            'gravity': request.data['gravity'], 
+            'type': request.data['type'],                    
             'author': request.user.id
         }
         serializer = TicketReadSerializer(instance, data=data)
         if serializer.is_valid():
             instance = serializer.save()   
             instance.category = Category.objects.get(id = request.data['category'] )  
-            instance.solution = Solution.objects.get(id = request.data['solution'] )         
+            instance.gravity = Gravity.objects.get(id = request.data['gravity'] )    
+            instance.type = Gravity.objects.get(id = request.data['type'] )         
             instance.author = request.user         
             instance.save()
             show = TicketReadSerializer(instance)
@@ -226,7 +233,10 @@ class BotTicketViewSet(viewsets.ModelViewSet):
         data = {
             'category': request.data['category'],          
             'description': request.data['description'],  
-            'solution': request.data['solution'],            
+            'gravity': request.data['gravity'],   
+            'type': request.data['type'],     
+            'lostOfHumanlifes': request.data['lostOfHumanlifes'],  
+            'injuries': request.data['injuries'],               
             'reference': uuid.uuid4().hex[:10],
             'author': userr
 
@@ -236,18 +246,28 @@ class BotTicketViewSet(viewsets.ModelViewSet):
         if category is None:
             return Response({"message": ["Cette catégorie n'existe pas"]}, status=status.HTTP_400_BAD_REQUEST) 
         
-        solution =  Solution.objects.filter(id=request.data['solution'] ).first()
+        gravity =  Gravity.objects.filter(id=request.data['gravity'] ).first()
  
-        if solution is None:
-            return Response({"message": ["Cette Solution n'existe pas"]}, status=status.HTTP_400_BAD_REQUEST) 
+        if gravity is None:
+            return Response({"message": ["Cette Gravité n'existe pas"]}, status=status.HTTP_400_BAD_REQUEST) 
+
+        type =  Type.objects.filter(id=request.data['type']).first()
+ 
+        if type is None:
+            return Response({"message": ["Ce type n'existe pas"]}, status=status.HTTP_400_BAD_REQUEST) 
 
         serializer = TicketReadSerializer(data=data)
         if serializer.is_valid():
             instance = serializer.save() 
             instance.category = Category.objects.get(id = request.data['category'] )  
-            instance.solution = Solution.objects.get(id = request.data['solution'] )  
+            instance.gravity = Gravity.objects.get(id = request.data['gravity'] )  
             instance.phoneNumber = request.data['phoneNumber']    
-            instance.platform = request.data['platform']  
+            instance.platform = request.data['platform']
+            instance.proceedings = request.data['proceedings']
+            instance.correction = request.data['correction']
+            instance.lostOfHumanlifes = request.data['lostOfHumanlifes']
+            instance.injuries = request.data['injuries']  
+            instance.type = Type.objects.get(id = request.data['type'] ) 
             instance.urgency = 1   
             instance.author = userr   
             instance.save()
@@ -453,29 +473,29 @@ def dashboard(request):
     fixed_tickets = Ticket.objects.filter(fixed=2).count()
     unfixed_tickets = Ticket.objects.filter(fixed=0).count()
     infixing_tickets = Ticket.objects.filter(fixed=1).count()
-    companies = Company.objects.all().count()
+    types = Type.objects.all().count()
 
     return Response({
         'fixed_tickets': fixed_tickets,
         'unfixed_tickets': unfixed_tickets,
         'infixing_tickets': infixing_tickets,
         'total_tickets': total_tickets,
-        'companies': companies,
+        'types': types,
 
     })
 
 
-# User's company solutions
+# User's type solutions
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def user_solutions(request):
     user = UserProfile.objects.filter(phoneNumber=request.data['phoneNumber'])  
     if len(user) > 0:  
-        solutions = Solution.objects.distinct().filter(company__users__phoneNumber=request.data['phoneNumber'])
+        gravities = Gravity.objects.distinct().filter(type__users__phoneNumber=request.data['phoneNumber'])
     else :
         return Response({"message": ["Utilisateur inconu !"]}, status=status.HTTP_400_BAD_REQUEST)
     
-    serializer = SolutionReadSerializer(solutions, many=True)    
+    serializer = GravityReadSerializer(gravities, many=True)    
     return Response(serializer.data)
 
 # Suivi ticket

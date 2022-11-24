@@ -14,11 +14,11 @@ from api.views import RegisterView
 router = DefaultRouter()
 router.register('users', views.UserProfileViewSet, basename='users')
 router.register('categories', views.CategoryViewSet, basename='categories')
-router.register('companies', views.CompanyViewSet, basename='companies')
+router.register('types', views.TypeViewSet, basename='types')
 router.register('tickets', views.TicketViewSet, basename='tickets')
 router.register('botTickets', views.BotTicketViewSet, basename='botTickets')
 router.register('replies', views.ReplyViewSet, basename='replies')
-router.register('solutions', views.SolutionViewSet, basename='solutions')
+router.register('gravities', views.GravityViewSet, basename='gravities')
 router.register('botSolutions', views.BotSolutionViewSet, basename='botSolutions')
 
 path('register/', RegisterView.as_view(), name='auth_register'),  

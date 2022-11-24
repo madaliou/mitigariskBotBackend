@@ -90,9 +90,9 @@ WSGI_APPLICATION = 'appSupport.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'appSupport',
-        'USER': 'root',
-        'PASSWORD': 'password',
+        'NAME': 'mitigariskReport',
+        'USER': 'madaliou',
+        'PASSWORD': 'azerty123',
         #root , geolo2021: password du root
         'HOST': 'localhost',   
         'PORT': '3306',
